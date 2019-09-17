@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.message.dao.SysOrganizeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.message.model.SysOrganize">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pid" property="pid"/>
+        <result column="status" property="status"/>
+        <result column="resver1" property="resver1"/>
+        <result column="resver2" property="resver2"/>
+        <result column="resver3" property="resver3"/>
+        <result column="resver4" property="resver4"/>
+    </resultMap>
+    <!-- 通用查询映射结果 -->
+    <resultMap id="ResultMap" type="com.message.model.SysOrganizeVo">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pid" property="pid"/>
+        <result column="status" property="status"/>
+        <result column="resver1" property="resver1"/>
+        <result column="resver2" property="resver2"/>
+        <result column="resver3" property="resver3"/>
+        <result column="resver4" property="resver4"/>
+    </resultMap>
+    <select id="seletSysOrganizeByPid" resultMap="ResultMap">
+        select so.id,so.name,so.pid,so.status from sys_organize so where so.pid=#{pid}
+        and so.status='0'
+    </select>
+
+
+    <select id="selectInfoById" resultMap="ResultMap">
+        select so.id,so.name,so.pid,so.status
+        from
+        sys_organize so
+        where so.id=#{id}
+        and so.status='0'
+    </select>
+
+    <select id="selectSysOrganizeById" resultMap="BaseResultMap" parameterType="String">
+        select * from sys_organize where id=#{id}
+    </select>
+</mapper>

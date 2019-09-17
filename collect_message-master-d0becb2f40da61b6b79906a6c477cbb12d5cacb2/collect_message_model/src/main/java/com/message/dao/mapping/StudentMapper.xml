@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.message.dao.StudentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.message.model.Student">
+        <id column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="idcard" property="idcard"/>
+        <result column="password" property="password"/>
+        <result column="channel" property="channel"/>
+        <result column="channel_id" property="channelId"/>
+        <result column="classes_id" property="classesId"/>
+        <result column="status" property="status"/>
+        <result column="user_id" property="userId"/>
+        <result column="operation" property="operation"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="sex" property="sex"/>
+        <result column="msg" property="msg"/>
+        <result column="resver2" property="resver2"/>
+        <result column="resver3" property="resver3"/>
+        <result column="resver4" property="resver4"/>
+    </resultMap>
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="ResultMap" type="com.message.model.StudentVo">
+        <id column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="idcard" property="idcard"/>
+        <result column="classes_id" property="classesId"/>
+        <result column="status" property="status"/>
+        <collection property="photos" ofType="PhotoMap" select="getStudents" column="code">
+
+        </collection>
+    </resultMap>
+
+
+    <resultMap id="PhotoMap" type="com.message.model.Images">
+        <id column="id" property="id"/>
+        <result column="url" property="url"/>
+        <result column="stu_id" property="stuId"/>
+        <result column="type" property="type"/>
+        <result column="resver1" property="resver1"/>
+        <result column="resver2" property="resver2"/>
+        <result column="resver3" property="resver3"/>
+        <result column="resver4" property="resver4"/>
+    </resultMap>
+
+    <select id="getStudents" parameterType="String" resultMap="PhotoMap">
+        select * from images where stu_id=#{code}
+    </select>
+
+
+    <!-- 查询未上传的个数 -->
+    <select id="selectnoupload" resultType="java.lang.Integer">
+        select count(*) from student
+        where classes_id=#{classid}
+        and status in('1','4','7');
+    </select>
+
+
+    <!-- 查询待审核总数 -->
+    <select id="selectnocheck" resultType="java.lang.Integer">
+        select count(*) from student
+        where classes_id=#{classid}
+        and status ='2'
+    </select>
+
+
+    <!-- 查询未已完成总数-->
+    <select id="selectfinished" resultType="java.lang.Integer">
+        select count(*) from student
+        where classes_id=#{classid}
+        and status ='6'
+    </select>
+
+    <select id="selectStudentByClassId" resultMap="ResultMap">
+        select * from student
+        where classes_id=#{classid}
+
+    </select>
+
+
+    <select id="selectStudentByClassIdAndStatus" resultMap="ResultMap" parameterType="java.util.Map">
+        select * from student
+        where classes_id=#{classid}
+        and status in
+        <foreach collection="aslist" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="selectStudentByCode" parameterType="String" resultMap="ResultMap">
+        select * from student
+        where code=#{code}
+    </select>
+</mapper>

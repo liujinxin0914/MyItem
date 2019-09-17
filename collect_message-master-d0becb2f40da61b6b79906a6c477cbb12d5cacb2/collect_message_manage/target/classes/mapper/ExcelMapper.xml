@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.chutianlong.dao.ExcelDao">
+    <insert id="importProduct">
+        insert into teacher(idcard,org_id,name,sex,mobile,ismaster,only,password) values
+        <foreach collection="teacheList" item="aa" index="index" separator=",">
+            (#{aa.idcard},#{aa.org_id},#{aa.name},#{aa.sex},#{aa.mobile},#{aa.ismaster},#{aa.only},#{aa.password})
+        </foreach>
+    </insert>
+    <select id="findSchool" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=#{pid}
+    </select>
+    <select id="findNj" parameterType="com.chutianlong.pojo.Sys_organize" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=#{pid}
+    </select>
+    <select id="findBj" parameterType="com.chutianlong.pojo.Sys_organize" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=#{pid}
+    </select>
+    <select id="findYj" parameterType="int" resultType="com.chutianlong.pojo.Sys_organize">
+         select id,name from sys_organize where pid=#{pid}
+    </select>
+
+
+    <!--根据学校查询-->
+    <select id="getCount" resultType="int">
+        select count(stu.idcard) from (select id from sys_organize where pid in(select id from sys_organize where pid = #{schools}))bj,student stu where stu.classes_id=bj.id
+    </select>
+
+    <select id="findStudent" resultType="map">
+        select syss.name classname,stu.name,stu.sex,stu.code,stu.idcard from
+        (select id from sys_organize where pid in(select id from sys_organize where pid = #{schools}))bj,student stu,sys_organize syss
+        <where>
+            bj.id=stu.classes_id and syss.id = stu.classes_id
+            <if test="name!=null and name!=''">
+                and stu.name=#{name}
+            </if>
+            <if test="code!=null and code!=''">
+                and stu.code=#{code}
+            </if>
+        </where>
+    </select>
+
+
+
+    <!--根据班级查询-->
+    <select id="getCountB" resultType="int">
+        select count(stu.code) from
+        student stu,sys_organize sys where stu.classes_id=sys.id and stu.classes_id=#{bj}
+    </select>
+    <select id="findStudentBybj" resultType="map">
+        select sys.name classname,stu.name,stu.sex,stu.code,stu.idcard from
+        student stu,sys_organize sys
+        <where>
+            stu.classes_id=sys.id and stu.classes_id=#{bj}
+            <if test="name!=null and name!=''">
+                and stu.name=#{name}
+            </if>
+            <if test="code!=null and code!=''">
+                and stu.code=#{code}
+            </if>
+        </where>
+    </select>
+
+
+
+    <!--根据年纪查询-->
+    <select id="getCountN" resultType="int">
+         select count(stu.code) from
+        (select id from sys_organize where pid = #{nj}) bj,student stu,sys_organize sys where bj.id=stu.classes_id and sys.id=stu.classes_id
+    </select>
+    <select id="findStudentBynj" resultType="map">
+        select sys.name classname,stu.name,stu.sex,stu.code,stu.idcard from
+        (select id from sys_organize where pid = #{nj}) bj,student stu,sys_organize sys
+        <where>
+            bj.id=stu.classes_id and sys.id=stu.classes_id
+            <if test="name!=null and name!=''">
+                and stu.name=#{name}
+            </if>
+            <if test="code!=null and code!=''">
+                and stu.code=#{code}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="importStudent">
+        insert into student(classes_id,`name`,sex,code,idcard,password,status) values
+        <foreach collection="studentList" item="aa" index="index" separator=",">
+            (#{aa.classes_id},#{aa.name},#{aa.sex},#{aa.code},#{aa.idcard},#{aa.password},'1')
+        </foreach>
+    </insert>
+
+    <insert id="importSchoolName" parameterType="String">
+        insert into sys_organize(name,pid,status) values(#{name},0,0)
+    </insert>
+
+    <!--查询学校是否存在-->
+    <select id="findSchoolByName" parameterType="String" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name,pid from sys_organize where name=#{schoolObject}
+    </select>
+
+    <!--添加学校并查询赋值给老师-->
+    <insert id="addSchool" parameterType="String">
+        insert into sys_organize(name,pid,status) values(#{name},0,0)
+    </insert>
+
+    <select id="findSchoolIsNot" parameterType="String" resultType="Object">
+        select id from sys_organize where name=#{Schoolname}
+    </select>
+
+
+    <insert id="addYuanxi">
+        insert into sys_organize(name,pid,status) values(#{yuanxi},#{yid},0)
+    </insert>
+    <insert id="addClasses">
+        insert into sys_organize(name,pid,status) values(#{ids},#{nianjiId},0)
+    </insert>
+
+
+    <select id="findidcard" parameterType="String" resultType="com.chutianlong.pojo.Student">
+        select idcard from student where idcard=#{idcard1}
+    </select>
+    <select id="findTeacherIdcard" parameterType="String" resultType="int">
+        select count(name) from teacher where idcard=#{id}
+    </select>
+    <select id="findCode" resultType="com.chutianlong.pojo.Student">
+        select code from student
+    </select>
+    <select id="findPid" parameterType="String" resultType="int">
+        select id from sys_organize where name=#{schoolname}
+    </select>
+    <select id="findclass" resultType="com.chutianlong.pojo.Sys_organize">
+        select id from sys_organize where id in (select id from sys_organize where pid=(select id from sys_organize where name=#{schoolname})) and name=#{yuanxi}
+    </select>
+    <select id="findNainJiName" resultType="String">
+        select id from sys_organize where name=#{yuanxi} and pid=#{yid}
+    </select>
+    <select id="findclassid" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name,pid from sys_organize where name=#{ids} and pid=#{nianjiId}
+    </select>
+    <select id="findSchoolName" parameterType="int" resultType="String">
+        select name from sys_organize where id=#{org_id}
+    </select>
+
+    <select id="findgrade" resultType="com.chutianlong.pojo.Sys_organize" parameterType="int">
+        select id,name,pid from sys_organize where pid=#{yid}
+    </select>
+    <select id="findClass" resultType="com.chutianlong.pojo.Sys_organize" parameterType="int">
+        select * from sys_organize where pid in(select id from sys_organize where pid=#{yid})
+    </select>
+    <select id="findNianji" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name,pid from sys_organize where name=#{yuanxi} and pid=#{yid}
+    </select>
+    <select id="getStudentByCode" resultType="map">
+          select stu.name,stu.sex,stu.code,org.name as classname from student stu LEFT JOIN sys_organize org on stu.classes_id=org.id where stu.code=#{code}
+    </select>
+    <select id="getStudentByName" resultType="map">
+          select stu.name,stu.sex,stu.code,org.name as classname from student stu LEFT JOIN sys_organize org on stu.classes_id=org.id where stu.name=#{name}
+    </select>
+    <select id="findSchoolGrade" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize
+    </select>
+    <select id="findClassAll" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name,pid from sys_organize where pid in(select id from sys_organize where pid=(select pid from sys_organize where id=(SELECT pid from sys_organize where id =#{yid})))
+    </select>
+    <select id="findGradeAll" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=(select pid from sys_organize where id=(select id from sys_organize where id=(select pid from sys_organize where id=#{yid})))
+    </select>
+</mapper>

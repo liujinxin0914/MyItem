@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chutianlong.dao.ManageDao">
+    <select id="findGrade" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid in(select id from sys_organize where id=#{id})
+    </select>
+    <select id="findClass" resultType="com.chutianlong.pojo.Sys_organize" parameterType="int">
+        select id,name from sys_organize where pid=#{messages}
+    </select>
+    <select id="getStudentMesg" resultType="com.chutianlong.pojo.Student" parameterType="com.chutianlong.pojo.Student">
+        select DISTINCT stu.name,stu.sex,stu.code,org.name as classname from student stu,sys_organize org
+        <where>
+            classes_id=#{classes_id} and org.id=stu.classes_id
+            <if test="name!=null and name!=''">
+                and stu.name=#{name}
+            </if>
+            <if test="code!=null and code!=''">
+                and stu.code=#{code}
+            </if>
+        </where>
+    </select>
+    <select id="getStudentMesgCount" resultType="int" parameterType="String">
+        select DISTINCT count(stu.code) as classname from student stu,sys_organize org where classes_id=#{classes} and org.id=stu.classes_id
+    </select>
+    <select id="getStudentMesgCountG" resultType="int" parameterType="String">
+        select DISTINCT count(stu.code) from student stu,(select id,name from sys_organize where pid=#{grade}) org where stu.classes_id=org.id
+    </select>
+    <select id="getStudentMesgG" resultType="com.chutianlong.pojo.Student" parameterType="com.chutianlong.pojo.Student">
+        select DISTINCT stu.name,stu.sex,stu.code,org.name as classname from student stu,(select id,name from sys_organize where pid=#{classes_id}) org
+        <where>
+            stu.classes_id=org.id
+            <if test="name!=null and name!=''">
+                and stu.name=#{name}
+            </if>
+            <if test="code!=null and code!=''">
+                and stu.code=#{code}
+            </if>
+        </where>
+    </select>
+    <select id="findStudent" parameterType="String" resultType="com.chutianlong.pojo.Student">
+        select stu.code,stu.name,stu.idcard,stu.sex,stu.classes_id,org.name as classname from student stu LEFT JOIN sys_organize org on stu.classes_id=org.id where stu.code = #{code}
+    </select>
+    <select id="findGrades" parameterType="String" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=(select id from sys_organize where id=(select pid from sys_organize where id=(select pid from sys_organize where id =(select classes_id from student where code =#{code}))))
+    </select>
+
+    <delete id="deletes" parameterType="String">
+        delete  from student where code = #{code}
+    </delete>
+
+    <select id="findstudentclass" parameterType="int" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid =#{ids}
+    </select>
+
+    <select id="findOneByCode" parameterType="String" resultType="com.chutianlong.pojo.Student">
+        select name from student where code=#{code}
+    </select>
+    <select id="findOneByIdcard" parameterType="String" resultType="com.chutianlong.pojo.Student">
+        select name from student where idcard=#{idcard}
+    </select>
+    <update id="updateStudent">
+        update student set classes_id=#{class_id},sex=#{isSex},name=#{name},code=#{code},idcard=#{idcard} where code=#{codeByone}
+    </update>
+
+    <update id="updatepasswordByStu">
+        update student set password=#{password} where code = #{code}
+    </update>
+
+    <insert id="addStudent">
+        insert into student(classes_id,sex,name,idcard,code,password,status) values(#{class_id},#{isSex},#{name},#{idcard},#{code},#{password},1)
+    </insert>
+
+    <select id="findGradesByorgid" parameterType="String" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=#{org_id}
+    </select>
+
+    <select id="getTeacherMesgCountG" resultType="int" parameterType="String">
+        select count(tea.idcard) from teacher tea,(select id,name from sys_organize where pid=(select id from sys_organize where id =#{grade})) bj where bj.id=tea.org_id
+    </select>
+    <select id="getTeacherMesgGs" parameterType="com.chutianlong.pojo.Teacher" resultType="com.chutianlong.pojo.Teacher">
+        select DISTINCT tea.name,tea.idcard,tea.mobile,bj.name as classname from teacher tea,(select id,name from sys_organize where pid=(select id from sys_organize where id =#{org_id})) bj
+        <where>
+            bj.id=tea.org_id
+            <if test="name!=null and name!=''">
+                and tea.name=#{name}
+            </if>
+            <if test="idcard!=null and idcard!=''">
+                and tea.idcard=#{idcard}
+            </if>
+        </where>
+    </select>
+    <select id="findGradeBytea" parameterType="int" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=#{id}
+    </select>
+    <select id="findteacher" parameterType="String" resultType="com.chutianlong.pojo.Teacher">
+       select idcard,name,mobile,only,sex from teacher where idcard=#{idcard}
+    </select>
+    <select id="getTeacherMesgCounts" parameterType="String" resultType="int">
+      select count(tea.idcard) from teacher_classes tc,teacher tea,sys_organize sys where sys.id=tc.org_id and tc.tea_id=tea.idcard and sys.id=#{org_id}
+    </select>
+    <select id="getTeacherMesgGss" resultType="com.chutianlong.pojo.Teacher" parameterType="com.chutianlong.pojo.Teacher">
+        select tea.name,tea.idcard,tea.mobile,tea.sex,sys.name as classname,sys.id as classid from teacher_classes tc,teacher tea,sys_organize sys
+        <where>
+            sys.id=tc.org_id and tc.tea_id=tea.idcard and sys.id=#{org_id}
+            <if test="name!=null and name!=''">
+                and tea.name=#{name}
+            </if>
+            <if test="idcard!=null and idcard!=''">
+                and tea.idcard=#{idcard}
+            </if>
+        </where>
+    </select>
+    <select id="findGradess" parameterType="String" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=#{org_id}
+    </select>
+    <select id="findOneByIdcardTea" parameterType="String" resultType="com.chutianlong.pojo.Teacher">
+        select idcard,name from teacher where idcard=#{idcard}
+    </select>
+
+    <update id="updateTeacher">
+        update teacher set name=#{name},idcard=#{idcard},mobile=#{mobile},sex=#{isSex} where idcard=#{idcardByone}
+    </update>
+
+    <delete id="deletesByTea">
+        delete from teacher where idcard=#{idcard}
+    </delete>
+
+    <update id="updatepasswordByTea">
+        update teacher set password=#{password} where idcard=#{idcard}
+    </update>
+
+    <select id="findOneByIdcardToTea" parameterType="String" resultType="com.chutianlong.pojo.Teacher">
+        select idcard,name from teacher where idcard=#{idcard}
+    </select>
+
+    <insert id="addTeacher">
+        insert into teacher(name,sex,idcard,mobile,org_id,only) values(#{name},#{isSex},#{idcard},#{mobile},#{org_id},#{temp})
+    </insert>
+
+    <select id="find" resultType="map">
+        select id from teacher_classes where tea_id=#{idcardByone}
+    </select>
+    <update id="updateTeacherAndClass">
+        update teacher_classes set org_id=#{class_id} where tea_id=#{idcardByone} and id=#{classids}
+    </update>
+    <insert id="addTeaAndOrg">
+        insert into teacher_classes(tea_id,org_id) values(#{idcard},#{classid})
+    </insert>
+
+    <select id="getGrade" resultType="map">
+        select id,name from sys_organize where pid=#{org_id}
+    </select>
+    <select id="findMessageToSch" resultType="map">
+      select id,name from sys_organize where pid=#{id}
+    </select>
+    <select id="getCountByclassId" resultType="int">
+        select count(code) from student where classes_id=#{id}
+    </select>
+    <select id="findTeacherNameByClasId" resultType="String">
+        select tea_id from teacher_classes where org_id=#{id}
+    </select>
+    <select id="getNotCountByclassId" resultType="int">
+        select count(code) from student where classes_id=#{id} and status=6
+    </select>
+    <select id="findTeacherNameByIdcard" resultType="String">
+        select name from teacher where idcard=#{teahcerIdcard}
+    </select>
+    <select id="findClassname" resultType="String">
+        select name from sys_organize where id=#{id}
+    </select>
+    <select id="xxid" resultType="String">
+        select pid from sys_organize where id=#{id}
+    </select>
+    <select id="getTeacherByIdcard" resultType="map">
+        select name,sex,idcard,mobile from teacher where idcard=#{idcard}
+    </select>
+    <select id="getStudentByCode" resultType="map">
+        select stu.name,stu.sex,stu.code,org.name as classname from student stu LEFT JOIN sys_organize org on stu.classes_id=org.id where code=#{code}
+    </select>
+    <select id="findStudentByCode" resultType="com.chutianlong.pojo.Student">
+        select code from student where code=#{code}
+    </select>
+    <select id="findOneTeacherByClassidAndTeaIdcard" resultType="String">
+        select id from teacher_classes where org_id=#{class_id}
+    </select>
+    <select id="getTeacherMesgCounta" resultType="int" parameterType="String">
+        select count(teache.idcard) from teacher_classes tea,(select id,name from sys_organize where pid=#{grade}) bj,teacher teache where tea.org_id=bj.id and teache.idcard=tea.tea_id
+    </select>
+    <select id="getTeacherMesg" resultType="map" parameterType="com.chutianlong.pojo.Teacher">
+        select teache.name,teache.mobile,teache.idcard,teache.sex,bj.name as classname,bj.id as classid from teacher_classes tea,(select id,name from sys_organize where pid=#{org_id}) bj,teacher teache
+        <where>
+            tea.org_id=bj.id and teache.idcard=tea.tea_id
+            <if test="name!=null and name!=''">
+                and teache.name=#{name}
+            </if>
+            <if test="idcard!=null and idcard!=''">
+                and teache.idcard=#{idcard}
+            </if>
+        </where>
+    </select>
+    <select id="findTeacherMangeClass" resultType="String">
+        select id from teacher_classes where tea_id = #{idcardByone} and org_id=#{class_id}
+    </select>
+    <select id="findTeacherIdcard" resultType="String">
+        select tea_id from teacher_classes where org_id=#{classid}
+    </select>
+    <delete id="deleteTeacherClass">
+        delete from teacher_classes where tea_id=#{classid}
+    </delete>
+    <update id="updateTeacherClasses">
+        update teacher_classes set tea_id=#{idcard},org_id=#{class_id} where tea_id=#{idcardByone} and id=#{id}
+    </update>
+    <select id="findSchoolId" parameterType="String" resultType="String">
+        select pid from sys_organize where id=#{id}
+    </select>
+    <select id="findStudentGrade" parameterType="String" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name from sys_organize where pid=#{org_id}
+    </select>
+    <select id="getTeacherCount" resultType="int">
+        select count(idcard) from teacher where org_id=#{orgid}
+    </select>
+    <select id="selectTeacher" parameterType="com.chutianlong.pojo.Teacher" resultType="map">
+        select name,idcard,mobile,sex from teacher
+        <where>
+            org_id=#{org_id}
+            <if test="name!=null and name!=''">
+                and name=#{name}
+            </if>
+            <if test="idcard!=null and idcard!=''">
+                and idcard=#{idcard}
+            </if>
+        </where>
+    </select>
+    <select id="grade" parameterType="com.chutianlong.pojo.Sys_organize" resultType="com.chutianlong.pojo.Sys_organize">
+          select id,name from sys_organize where pid=#{org_id}
+    </select>
+    <select id="classes" parameterType="com.chutianlong.pojo.Sys_organize" resultType="com.chutianlong.pojo.Sys_organize">
+          select id,name from sys_organize where pid in (select id from sys_organize where pid=#{org_id})
+    </select>
+    <select id="findgradea" resultType="String" parameterType="int">
+       select id from sys_organize where id=(select pid from sys_organize where id=#{classes_id})
+    </select>
+    <select id="getStudentByName" resultType="map">
+            select stu.name,stu.sex,stu.code,org.name as classname from student stu LEFT JOIN sys_organize org on stu.classes_id=org.id where stu.name=#{name}
+    </select>
+    <select id="findTeacherAndClass"  resultType="String">
+        select id from teacher_classes where tea_id=#{idcardByone} and org_id=#{class_id}
+    </select>
+    <insert id="insertTeacherClasses">
+        insert into teacher_classes(tea_id,org_id) values(#{idcard},#{class_id})
+    </insert>
+</mapper>

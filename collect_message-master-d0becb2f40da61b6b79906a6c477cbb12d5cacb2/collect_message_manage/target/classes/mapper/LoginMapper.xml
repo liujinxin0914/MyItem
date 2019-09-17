@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chutianlong.dao.LoginDao">
+    <select id="teacherLogin" resultType="com.chutianlong.pojo.Teacher">
+      select org.name as classname,tea.name,tea.password,tea.org_id as org_id,tea.ismaster from teacher tea,sys_organize org where tea.idcard=#{idcard} and tea.org_id=org.id
+    </select>
+    <select id="pictureWorker" resultType="com.chutianlong.pojo.Picture_worker">
+        select id,idcard,password from picture_worker where idcard=#{idcard}
+    </select>
+    <select id="adminLogin" resultType="com.chutianlong.pojo.admin">
+        select id,idcard,password from admin where idcard=#{idcard}
+    </select>
+</mapper>

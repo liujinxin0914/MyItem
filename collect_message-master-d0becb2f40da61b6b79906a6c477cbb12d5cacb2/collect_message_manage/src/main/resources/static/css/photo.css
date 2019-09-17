@@ -1,0 +1,189 @@
+@import url("/static/css/lib/resetCss.css");
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; }
+
+.container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ==================================== content BEGIN */
+.section {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  height: 100%; }
+
+.content {
+  width: 1000px;
+  background: #fff;
+  margin: 30px auto;
+  padding: 0 0 100px;
+}
+.content .nav {
+  width: 150px;/*1111111111111111111111111111111111111111111111111111111111111111111*/
+  background: #dbf4ff;
+  margin: 0 auto 30px; }
+.content .nav li {
+  color: #33b3ed;
+  font-size: 16px;
+  padding: 10px 43px;
+  float: left; }
+.content .nav li.on {
+  background: #33b3ed;
+  color: #fff; }
+.content .photo .allPhoto {
+  padding: 0 10px 0px 78px; }/*111111111111111111111111111111111111111111111111111111111111111111111111111111111111*/
+.content .photo dl {
+  margin: 0 40px 40px 0;
+  position: relative;
+  float: left; }
+.content .photo .allPhoto .gouxuan{
+  width:24px;
+  height:24px;
+  position: absolute;
+  bottom: 53px;
+  right: 1px;
+}
+.content .photo .allPhoto .check{
+  width:100%;
+  height:100%;
+  z-index: 100;
+  opacity: 0;
+}
+.content .photo .allPhoto .gouxuan .check,.content .photo .allPhoto .gouxuan label{
+  position: absolute;
+  bottom:0;
+  right: 0;
+}
+.content .photo .allPhoto .gouxuan .weixuanzhong{
+  width:24px;
+  height:24px;
+  background: url('/static/img/photo/weigouxuan.png') no-repeat;
+  background-size: 100% 100%;
+  display:inline-block;
+}
+.content .photo .allPhoto .gouxuan input:checked+label{
+  width:24px;
+  height:24px;
+  background: url('/static/img/photo/gouxuan.png') no-repeat;
+  background-size: 100% 100%;
+  /*z-index: 10;*/
+  /*display:inline-block;*/
+}
+
+.content .photo dl dt img {
+  width: 180px;
+  height: 220px; }
+.content .photo dl dd {
+  text-align: center; }
+.content .photo dl dd .name, .content .photo dl dd .xjh {
+  color: #333;
+  font-size: 14px;
+  margin-top: 10px; }
+.content .photo dl.addPhoto {
+  width: 180px;
+  height: 220px;
+  background: #efeaea; }
+.content .photo dl.addPhoto img {
+  margin: 70px 50px; }
+.content .photo .nonePhoto {
+  display: none;
+  width: 224px;
+  height: 300px;
+  margin: 80px auto 20px; }
+.content .btn {
+  width: 80px;
+  margin: 0 auto; }
+.content .btn input[type="submit"] {
+  height: 40px;
+  padding: 0 20px;
+  line-height: 40px;
+  font-size: 18px;
+  display: inline-block;
+  border-radius: 10px; }
+.content .btn #demo {
+  background: #00a0e9;
+  color: #fff;
+  margin-right: 50px; }
+.content .btn .submitBtn {
+  margin-right: 30px; }
+.content .btn .submitBtn, .content .btn .deleteBtn {
+  border: 1px solid #00a0e9;
+  color: #00a0e9; }
+
+.content .page{
+  width: 100%;
+  text-align: right;
+}
+.content .page input[type="submit"]{
+  background: transparent;
+}
+
+.content .nav_content .form {
+  margin: 0 30px 30px; }
+.content .nav_content .form .item {
+  display: inline-block;
+  margin: 0 0 20px 50px; }
+.content .nav_content .form .item .label, .content .nav_content .form .item .inputVal {
+  display: inline-block; }
+.content .nav_content .form .item .label {
+  width: 100px;
+  line-height: 44px;
+  color: #333;
+  font-size: 14px; }
+.content .nav_content .form .item .label span {
+  color: red; }
+.content .nav_content .form .item .inputVal {
+  width: 280px;
+  height: 44px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  position: relative; }
+.content .nav_content .form .item .inputVal input, .content .nav_content .form .item .inputVal select {
+  width: 93%;
+  height: 100%;
+  color: #666;
+  margin: 0 3%;
+  font-size: 14px;
+  padding-left: 5px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none; }
+.content .nav_content .form .item .sel:after {
+  content: "";
+  width: 32px;
+  height: 32px;
+  background: url("/static/img/teacher_gl/down.png");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  pointer-events: none; }
+.content ._btn{
+  width:300px;
+  margin: 0 auto; }
+.content ._btn span{
+  height: 40px;
+  padding: 0 20px;
+  line-height: 40px;
+  font-size: 18px;
+  display: inline-block;
+  border-radius: 10px; }
+.content ._btn .addBtn {
+  background: #00a0e9;
+  color: #fff;
+  margin-right: 10px;
+  margin-left: 25px;}/*1111111111111111111111111111111111111111111111111111111111111111111111111*/
+.content ._btn .cancelBtn {
+  border: 1px solid #00a0e9;
+  color: #00a0e9;
+  margin-left: 8px;
+  margin-right: 10px
+
+}
+/* ==================================== content END */

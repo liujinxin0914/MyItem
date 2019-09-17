@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.chutianlong.dao.UploadDao">
+    <insert id="add">
+        insert into images(url,stu_id,type) values(#{url},#{org_id},0)
+    </insert>
+    <select id="findList" resultType="map">
+        select img.url,stu.name,stu.code from images img LEFT JOIN student stu on img.stu_id=stu.code
+        <where>
+            stu.classes_id=#{bj} and stu.status=3 and img.type=0
+            <if test="name!=null and name!=''">
+                and stu.name=#{name}
+            </if>
+            <if test="code!=null and code!=''">
+                and stu.code=#{code}
+            </if>
+        </where>
+    </select>
+    <select id="findListByphoto" parameterType="String" resultType="int">
+        select count(img.id) from images img LEFT JOIN student stu on img.stu_id=stu.code where stu.classes_id=#{bj} and stu.status=3 and img.type=0
+    </select>
+    <update id="goShens">
+        update student set status=6 where code=#{str}
+    </update>
+    <update id="turnDown">
+        update student set status=7,msg=#{refuse} where code=#{str}
+    </update>
+    <select id="findImg" resultType="map">
+        select url from images where stu_id=#{str}
+    </select>
+    <select id="findStudentStatus" resultType="int">
+        select stu_id from images where url=#{str}
+    </select>
+    <update id="updateStudentStatus">
+        update student set status=5 where code=#{studentid}
+    </update>
+    <select id="findListByCode" resultType="map">
+select img.url,stu.name,stu.code from images img LEFT JOIN student stu on img.stu_id=stu.code where stu.code=#{code} and stu.status=3 and img.type=0
+   </select>
+    <update id="updateStudentStatusByOrg_id">
+        update student set status=6 where code=#{org_id}
+    </update>
+    <select id="findTest" resultType="com.chutianlong.pojo.Student">
+        select name from student where status!=3 and code=#{str}
+    </select>
+    <update id="tongguo">
+        update student set status=6 where code=#{str}
+    </update>
+    <select id="findURLByStudentCode" resultType="String">
+        select url from images where stu_id=#{str} and type=0
+    </select>
+    <select id="findStu_ID" resultType="String">
+        select stu_id from images where url like concat('%',#{s},'%')
+    </select>
+    <delete id="deletePhoto">
+        delete from images where stu_id=#{str}
+    </delete>
+    <delete id="deletePhotoByCode">
+        delete from images where stu_id=#{str} and type=0
+    </delete>
+    <select id="findListByName" resultType="map">
+        select img.url,stu.name,stu.code from images img LEFT JOIN student stu on img.stu_id=stu.code where stu.name=#{name} and stu.status=3 and img.type=0
+   </select>
+    <select id="findStudentStastus" resultType="String" parameterType="String">
+        select name from student where status =5 and code =#{orgId}
+    </select>
+    <select id="findStudentByCodeAndName" resultType="String">
+        select name from student where name=#{studentname} and code = #{orgId}
+    </select>
+    <select id="findClassName" resultType="com.chutianlong.pojo.Sys_organize">
+        select id,name,pid from sys_organize where id=#{orgId}
+    </select>
+    <select id="findStudentMessage" resultType="com.chutianlong.pojo.Student">
+        select classes_id from student where code=#{parseDouble}
+    </select>
+</mapper>

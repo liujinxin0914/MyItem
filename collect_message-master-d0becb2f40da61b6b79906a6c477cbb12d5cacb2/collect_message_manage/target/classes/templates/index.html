@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html>
+<head >
+    <title>导入数据.html</title>
+    <meta name="keywords" content="keyword1,keyword2,keyword3"></meta>
+    <meta name="description" content="this is my page"></meta>
+    <meta name="content-type" content="text/html; charset=UTF-8"></meta>
+    <link rel="stylesheet" href="/static/css/lib/common.css">
+    <link rel="stylesheet" href="/static/css/teacher_gl.css">
+    <link rel="stylesheet" href="/static/css/index_like.css">
+
+
+</head>
+
+
+<!--防止用户进行操作-->
+<div class="container">
+    <div class="header">
+        <div class="header_content">
+            <div class="left">
+                <img src="/static/img/teacher_gl/logo.png" class="logo">
+                <img src="/static/img/teacher_gl/tit.png" class="tit">
+            </div>
+            <div class="right">
+                <div class="user_name">
+                    <img src="/static/img/teacher_gl/user.png" alt="">
+                    <span th:if="${session.admins !=null && session.admins!= ''}">
+                        <span class="name" th:text="${session.admins.idcard}"></span>
+                    </span>
+                </div>
+                <div class="user_help" style="cursor:pointer">
+                    <img src="/static/img/teacher_gl/bz.png" alt="">
+                    <span class="name" onclick="off()">注销</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="content" >
+            <ul class="nav clearfix" style="cursor:pointer;width: 300px">
+                <li onclick="toIndex()" id="G1" style="background: #00a0e9; color:#fff;">导入信息</li>
+                <li onclick="toTea()" id="G2">信息查询</li>
+            </ul>
+
+            <div class="nav_content">
+                <form action="/Excel/ExcelDownTeacher" method="post">
+                    <button type="submit"
+                            style="cursor:pointer;width: 120px;height: 30px;margin-left:1000px;margin-bottom: 30px;background: #D2E9FF;color: #00a0e9;" >下载模板</button>
+                </form>
+
+                <div>
+                    <div id="student" style="cursor: pointer;text-align: center; width: 130px;height: 30px;background: #D2E9FF;color: #00a0e9;font-size: 15px;float: right;margin-right: 740px">
+                        <span class="search" onclick="StudentDr(this.id)" style="text-align:center;width: 130px;height: 30px;line-height:30px">导入学生信息</span>
+                    </div>
+                    <div id="teacher" style="text-align: center; width: 130px;height: 30px;background: #D2E9FF;color: #00a0e9;font-size: 15px;cursor: pointer">
+                        <span class="search" onclick="TeacherDr(this.id)" style="width: 130px;height: 30px;line-height:30px">导入老师信息</span>
+                    </div>
+                </div>
+
+
+                <form name="importStudent" action="/Excel/studentExcelDR" method="post" enctype="multipart/form-data">
+                    <input type="file" name="productData" value=""
+                           style="cursor:pointer;width: 400px;" />
+                    <button type="submit" onclick="wait()"
+                            style="margin-top:30px;cursor:pointer;width: 120px;height: 30px;background: #D2E9FF;color: #00a0e9;">提交学生信息</button>
+                </form>
+                <form name="importTeacher" action="/Excel/teacherExcelDR" method="post" enctype="multipart/form-data">
+                    <input type="file" name="productData" value=""
+                           style="cursor:pointer;width: 400px;" />
+                    <button type="submit" onclick="wait()"
+                            style="margin-top:30px;cursor:pointer;width: 120px;height: 30px;background: #D2E9FF;color: #00a0e9;">提交老师信息</button>
+                </form>
+
+
+                <div class="page" style="margin-left: 700px">
+                    <input type="button" value="上一页" onclick="pre()" style="cursor:pointer;">
+                    <input type="button" value="下一页" onclick="nexta()" style="cursor:pointer;">
+                    <a name="dangqianye"></a>
+                    <a name="countye"></a>
+                </div>
+
+                <div th:if="${totalRow!=null}" style="text-align: center;font-size: 25px" class="keep">
+                    导入结束。总<span th:text="${totalRow}"></span>条,成功<span th:text="${successcount}"></span>条,失败<span th:text="${errorcount}"></span>条
+                </div>
+
+                <table  th:if="${map != null}">
+                    <thead>
+                    <tr>
+                        <td>错误信息&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                        <form action="/Excel/errordc" method="post">
+                            <!--<input type="hidden" id="teacherListError" th:value="${teacherListError}" name="teacherListError">-->
+                            <input type="hidden" id="teacherListError"  name="teacherListError">
+                            <input type="hidden" id="studentListError"  name="studentListError">
+                            <input type="hidden" th:value="${isStuOrTea}" name="isStuOrTea">
+                            <input type="hidden" th:value="${message}" name="message">
+                            <span th:if="${message!=null}">
+                                <input type="submit" value="导出错误信息">
+                            </span>
+                        </form>
+
+                        </td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s:${map}">
+                        <td th:if="${s=='系统错误=请使用xlsx文件，请使用推荐模板导入，防止错误'}">error()</td>
+                        <td th:text="${s}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <!--<input type="hidden" th:value="${teacherListError}" class="errorList">-->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wait" style="background:transparent;position:absolute;width: 100%;top: 0%;left: 0%;height: 100%;display: none;z-index: 999;">
+                <div style="text-align: center;font-size: 20px;margin-top: 400px;color: chartreuse">导入中，请稍后...</div>
+</div>
+
+
+</body>
+</html>
+<script th:inline="javascript">
+var errorLists = [[${teacherListError}]];
+var errorListstu = [[${studentListError}]];
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    var errorListTeacher = JSON.stringify(errorLists);
+    var errorListStudent = JSON.stringify(errorListstu);
+    $("#teacherListError").val(errorListTeacher);
+    $("#studentListError").val(errorListStudent);
+    console.log(errorListStudent);
+    function errorDC() {
+
+        //这里没有用了，用的form  在哪儿
+
+        location=encodeURIComponent("/Excel/errordc?errorList="+errorListTeacher);
+    }
+    function toIndex() {
+        location="/Excel/index";
+    }
+    function toTea() {
+        location="/Excel/toTea";
+    }
+    function StudentDr(id) {
+        $('table').hide();
+        $('.keep').hide();
+        $("[name='importStudent']").show();
+        $("[name='importTeacher']").hide();
+        $("#student").css({"background": "#00a0e9"});
+        $("#teacher").css({"background": "#D2E9FF"});
+        $("#teacher").css({"color": "#00a0e9"});
+        $("#student").css({"color": "#ffffff"});
+
+    }
+    function TeacherDr() {
+        $('table').hide();
+        $('.keep').hide();
+        $("[name='importStudent']").hide();
+        $("[name='importTeacher']").show();
+        $("#student").css({"background": "#D2E9FF"});
+        $("#teacher").css({"background": "#00a0e9"});
+        $("#teacher").css({"color": "#ffffff"});
+        $("#student").css({"color": "#00a0e9"});
+    }
+    function off() {
+        location="/Login/off";
+    }
+    function error(){
+        alert("请先选择文件");
+        return false;
+    }
+    <!--学校-->
+    $(function(){
+        $('.page').hide();
+        $("[name='importStudent']").hide();
+        $("[name='importTeacher']").hide();
+        $.post(
+            "/Excel/findSchool",
+            function (data) {
+                if(data!=null){
+                    for (var i=0;i<data.length;i++) {
+                        $("[name='school']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                }
+            },
+            "json"
+        );
+    })
+    function wait() {
+        $(".wait").css("display","block");
+    }
+
+</script>

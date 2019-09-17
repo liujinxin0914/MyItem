@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学员添加</title>
+    <link rel="stylesheet" href="/static/css/index_work.css" type="text/css">
+</head>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    function add() {
+        $.post(
+            "/Manage/insert",
+            $("form").serialize(),
+            function (data) {
+                if(data==3){
+                    alert("请选择班级");
+                }if(data==4){
+                    alert("身份证号或学籍号重复");
+                }if(data.i==1){
+                    alert("成功");
+                    location="/Manage/index?org_id="+data.org_id+"&classname="+data.classname;
+                }if(data==5){
+                    alert("身份证号不符合规则");
+                }
+                if(data==6){
+                    alert("姓名输入不合法");
+                }if(data==7){
+                    alert("姓名不能为空");
+                }if(data==8){
+                    alert("性别不能为空");
+                }if(data==9){
+                    alert("学籍号不合法")
+                }if(data==10){
+                    alert("身份证号不合法");
+                }if(data==12){
+                    alert("姓名长度不能小于2");
+                }if(data==13){
+                    alert("学籍号不能含有中文");
+                }
+            },
+            "json"
+        );
+    }
+    function findclass(id){
+        $.post(
+            "/Manage/findstudentclass",
+            {id:id.value},
+            function (data) {
+                $("[name='class_id']").empty();
+                if(data!=null){
+                    for (var i=0;i<data.length;i++){
+                        $("[name='class_id']").append("<option value="+data[i].id+">"+data[i].name+"</option>>");
+                    }
+                }
+            },
+            "json"
+        );}
+</script>
+<body>
+<form class="studentclass" name="studentclass">
+    <table>
+        <input type="hidden" name="idcardByone" th:value="*{idcardByone}" id="idcardByone">
+        <input type="hidden" name="codeByone" th:value="*{codeByone}" id="codeByone">
+        <input type="hidden" name="org_id" th:value="*{org_id}" id="org_id">
+        <input type="hidden" name="classname" th:value="*{classname}" id="classname">
+        <tr>
+            <td>
+                年级<select onchange="findclass(this)">
+                <option value="">请选择</option>
+                <option th:each="org:${orgList}" th:value="${org.id}" th:text="${org.name}"></option>
+            </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                班级<select name="class_id">
+                <option value="">请选择</option>
+            </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                姓名<input type="text" name="name" placeholder="请输入学员姓名" maxlength="10">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                性别<input type="radio" name="sex" th:value="女">女
+                <input type="radio" name="sex" th:value="男">男
+            </td>
+        </tr>
+        <tr>
+            <td>
+                身份证号<input type="text" name="idcard" placeholder="请输入身份证号">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                学籍号<input type="text" name="code" placeholder="请输入学籍号">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="button" value="添加" onclick="add()">
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

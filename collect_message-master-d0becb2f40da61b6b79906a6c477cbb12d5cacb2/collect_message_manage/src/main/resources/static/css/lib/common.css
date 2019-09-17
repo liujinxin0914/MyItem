@@ -1,0 +1,55 @@
+.header{
+    width:100%;
+    height:60px;
+    background:#00a0e9;
+}
+.header .header_content{
+    width:1000px;
+    margin:0 auto;
+}
+.header .header_content .left{
+    float: left;
+}
+.header .header_content .right{
+    float: right;
+}
+.header .header_content .left .logo{
+    width:60px;
+    height:60px;
+}
+.header .header_content .left .tit{
+    width:300px;
+    margin-bottom:11px;
+}
+.header .header_content .right .user_name,.header .header_content .right .user_help {
+    margin:15px 20px 0 0;
+    display: inline-block;
+}
+.header .header_content .right .user_name img,.header .header_content .right .user_help img{
+    width:30px;
+    height:30px;
+    vertical-align: middle;
+}
+.header .header_content .right .user_name .name,.header .header_content .right .user_help .name{
+    font-size:18px;
+    color:#fff;
+    display: inline-block;
+}
+
+.header .header_content .right .user_name span,.header .header_content .right .user_help span{
+    display: block;
+    float: right;
+    margin-left: 5px;
+}
+.page{
+    margin:30px;
+}
+.page span{
+    font-size:14px;
+    margin-right:20px;
+    cursor:pointer;
+}
+.page a{
+    font-size:16px;
+    margin:0 10px;
+}

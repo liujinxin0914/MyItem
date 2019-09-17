@@ -1,0 +1,300 @@
+/*
+Copyright (c) 2009, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+version: 2.8.0r4
+*/
+*{
+  box-sizing: border-box;
+  margin:0;
+  padding:0;
+}
+html {
+  color: #333;
+  direction: ltr;
+}
+body {
+  font-family: "萍方";
+  /*font-size: 62.5%;
+	_font-size: 62.5%;
+	*font-size: 62.5%;
+	font-size: 62.5%\9;*/
+}
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+input,
+button,
+textarea,
+p,
+blockquote,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+fieldset,
+img {
+  border: 0;
+  vertical-align: bottom;
+}
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var,
+optgroup {
+  font-style: inherit;
+  font-weight: inherit;
+}
+del,
+ins,
+a {
+  text-decoration: none;
+}
+li {
+  list-style: none;
+}
+caption,
+th {
+  text-align: left;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 100%;
+  font-weight: normal;
+}
+q:before,
+q:after {
+  content: '';
+}
+abbr,
+acronym {
+  border: 0;
+  font-variant: normal;
+}
+sup {
+  vertical-align: baseline;
+}
+sub {
+  vertical-align: baseline;
+}
+legend {
+  color: #000;
+}
+input,
+button,
+textarea,
+select,
+optgroup,
+option {
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+  border:0;
+	outline:none;
+	/*-webkit-appearance: none;	*/
+	-webkit-tap-highlight-color:transparent;/*解决iOS中input，点击光标时背景色是灰色的*/
+}
+div{
+  -webkit-tap-highlight-color:transparent;/*解决iOS中input，点击光标时背景色是灰色的*/
+}
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  }
+::selection,::-moz-selection,::-webkit-selection{
+   background:none;
+}/*解决选中文字时的背景色是蓝色*/
+
+input,
+button,
+textarea,
+select {
+  *font-size: 100%;
+}
+article,
+aside,
+dialog,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section,
+time,
+mark,
+audio,
+video,
+details,
+summary {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent;
+}
+article,
+aside,
+dialog,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section,
+figcaption,
+details,
+summary {
+  display: block;
+}
+nav ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+mark {
+  background-color: #ff9;
+  color: #000;
+  font-style: italic;
+  font-weight: bold;
+}
+details:not([open]) > *:not(summary) {
+  display: none;
+}
+.clearfix {/*IE8以上和非IE浏览器才支持:after，zoom(IE转有属性)可解决ie6,ie7浮动问题*/
+  zoom: 1;
+  /*display: inline-block;*/
+}
+.clearfix:before {
+  content: '';
+  display: block;
+}
+.clearfix:after {
+    content: "."; 
+    display: block; 
+    height: 0; 
+    clear: both; 
+    visibility: hidden;
+}
+
+*,*:after,*:before{
+  -webkit-box-sizing:border-box;
+}
+
+/*IE6-PNG解决方案*/
+.png img {azimuth: expression(
+this.pngSet?this.pngSet=true:(this.nodeName == "IMG" && this.src.toLowerCase().indexOf('.png')>-1?(this.runtimeStyle.backgroundImage = "none",
+this.runtimeStyle.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.src + "', sizingMethod='image')",
+this.src = "transparent.gif"):(this.origBg = this.origBg? this.origBg :this.currentStyle.backgroundImage.toString().replace('url("','').replace('")',''),
+this.runtimeStyle.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='" + this.origBg + "', sizingMethod='crop')",
+this.runtimeStyle.backgroundImage = "none")),this.pngSet=true);}
+/*======================================= Hides from IE-mac \*/
+
+/*  * html .clearfix { height:1%;}
+    .clearfix { display:block;}*/
+
+/*======================================== End hide from IE-mac */
+
+
+/*改变placeholder颜色*/
+input::-webkit-input-placeholder{
+    color:#999;
+}
+input::-moz-placeholder{   /* Mozilla Firefox 19+ */
+    color:#999;
+}
+input:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+    color:#999;
+}
+input:-ms-input-placeholder{  /* Internet Explorer 10-11 */ 
+    color:#999;
+}
+.none{
+  display: none;
+}
+/*===================================== table BEGIN*/
+/*table,
+thead,
+tbody,
+tfoot,
+tr,
+th,
+td,
+caption,
+col,
+colgroup {
+	text-align: inherit;
+	line-height: inherit;
+	font-size: 100%;
+}
+
+table {
+	display: table;
+}
+
+thead {
+	display: table-header-group;
+}
+
+tbody {
+	display: table-row-group;
+}
+
+tfoot {
+	display: table-footer-group;
+}
+
+tr {
+	display: table-row;
+}
+
+th,
+td {
+	display: table-cell;
+}
+
+caption {
+	display: table-caption;
+}
+
+col {
+	display: table-column;
+}
+
+colgroup {
+	display: table-column-group;
+}*/
+/*===================================== table END*/
