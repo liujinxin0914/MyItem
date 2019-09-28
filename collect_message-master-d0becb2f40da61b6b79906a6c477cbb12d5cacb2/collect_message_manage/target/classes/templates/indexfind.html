@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html>
+<head >
+    <title>导入数据.html</title>
+    <meta name="keywords" content="keyword1,keyword2,keyword3"></meta>
+    <meta name="description" content="this is my page"></meta>
+    <meta name="content-type" content="text/html; charset=UTF-8"></meta>
+    <link rel="stylesheet" href="/static/css/lib/common.css">
+    <link rel="stylesheet" href="/static/css/teacher_gl.css">
+    <link rel="stylesheet" href="/static/css/index_like.css">
+    <link rel="stylesheet" href="/static/css/combo.select.css">
+
+
+</head>
+<script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.combo.select.js"></script>
+
+<script>
+    /*function findSchool() {
+        var schoolname = $('#schoolname').val();
+        if(schoolname==""||schoolname==null||schoolname==" "){
+            return false;
+        }
+    }*/
+    function toIndex() {
+        location="/Excel/index";
+    }
+    function toTea() {
+        location="/Excel/index";
+    }
+    function off() {
+        location="/Login/off";
+    }
+    function error(){
+        alert("请先选择文件");
+        return false;
+    }
+    <!--学校-->
+    $(function(){
+        $('table').hide();
+        $('.page').hide();
+        $("[name='importStudent']").hide();
+        $("[name='importTeacher']").hide();
+
+        $.post(
+            "/Excel/findSchool",
+            /*{schoolname:schoolname},*/
+            function (data) {
+                if(data!=null){
+                    $("[name='school']").append("<option value=''>请输入学校名称</option>");
+                    for (var i=0;i<data.length;i++) {
+                        $("[name='school']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                    $("[name='school']").comboSelect();
+                }
+            },
+            "json"
+        );
+
+    })
+    <!--年级-->
+    function erji(pid){
+        if(pid==""){
+            $("[name='Nj']").empty();
+            $("[name='Bj']").empty();
+        }
+        $("[name='Nj']").empty();
+        $.post(
+            "/Excel/findNj",
+            {pid:pid.value},
+            function(data) {
+                if(data!=null){
+                    $("[name='Nj']").append("<option value=>--请选择--</option>");
+                    for (var i=0;i<data.length;i++) {
+                        $("[name='Nj']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                }
+            },
+            "json"
+        );
+    }
+    <!--班级-->
+    function sanji(pid){
+        $("[name='Bj']").empty();
+        $.post(
+            "/Excel/findBj",
+            {pid:pid.value},
+            function(data) {
+                if(data!=null){
+                    $("[name='Bj']").append("<option value=>--请选择--</option>");
+                    for (var i=0;i<data.length;i++) {
+                        $("[name='Bj']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                }
+            },
+            "json"
+        );
+    }
+    <!--分页-->
+    function findStudent(){
+        var name = $("[name='name']").val();
+        if(($("[name='school']").val())==null&&($("[name='school']").val())==""&&name==null&&name==""){
+            alert("请选择学校");
+        }
+        $.post(
+            "/Excel/findStudent",
+            $("[name='findstudent']").serialize(),
+            function (data) {
+                console.log(data);
+                $("[name='pageNum']").attr("value",data.pageNum);
+                $("[name='pageSize']").attr("value",data.pageSize);
+                if(data.data!=null&&data.data!=""){
+                    if(data.data.length>0){
+                        $('table').show();
+                        $('.page').show();
+                    }
+                    var str="";
+                    for (var i=0;i<data.data.length;i++) {
+                        str+="<tr><td>"+data.data[i].classname+"</td>";
+                        str+="<td>"+data.data[i].name+"</td>";
+                        if(data.data[i].sex==0){
+                            str+="<td>男</td>";
+                        }else{
+                            str+="<td>女</td>";
+                        }
+                        str+="<td>"+data.data[i].code+"</td>";
+                        str+="<td>"+data.data[i].idcard+"</td></tr>"
+                    }
+                    $("[name='list']").html(str);
+                    var pagenum = $("[name='pageNum']").val();
+                    var pagesize = $("[name='pageSize']").val();
+                    $("[name='dangqianye']").html("当前第"+1+"页");
+                    $("[name='countye']").html("共"+pagesize+"页");
+                }else{
+                    alert("查无信息");
+                    $('table').hide();
+                    $('.page').hide();
+                    return false;
+                }
+            },
+            "json"
+        );
+    }
+    function pre() {
+        var pagenum = $("[name='pageNum']").val();
+        if((parseInt(pagenum-1)!=0)){
+            $("[name='dangqianye']").html("当前第"+(parseInt(pagenum)-1)+"页");
+        }
+        $("[name='pageNum']").val(parseInt(pagenum)-1);
+
+        $.post(
+            "/Excel/findStudent",
+            $("[name='findstudent']").serialize(),
+            function (data) {
+                $("[name='pageNum']").attr("value",data.pageNum);
+                if(data!=null){
+                    var str="";
+                    for (var i=0;i<data.data.length;i++) {
+                        str+="<tr><td>"+data.data[i].classname+"</td>";
+                        str+="<td>"+data.data[i].name+"</td>";
+                        if(data.data[i].sex==0){
+                            str+="<td>男</td>";
+                        }else{
+                            str+="<td>女</td>";
+                        }
+                        str+="<td>"+data.data[i].code+"</td>";
+                        str+="<td>"+data.data[i].idcard+"</td></tr>"
+                    }
+                    $("[name='list']").html(str);
+                }
+            },
+            "json"
+        );
+    }
+    function nexta(){
+        var pagenum = $("[name='pageNum']").val();
+        var pagesize = $("[name='pageSize']").val();
+        if((parseInt(pagenum)<parseInt(pagesize))){
+            $("[name='dangqianye']").html("当前第"+(parseInt(pagenum)+1)+"页");
+            $("[name='countye']").html("共"+pagesize+"页");
+        }
+        if(parseInt(pagenum)<parseInt(pagesize)){
+            $("[name='pageNum']").val(parseInt(pagenum)+1);
+        }
+        $.post(
+            "/Excel/findStudent",
+            $("[name='findstudent']").serialize(),
+            function (data) {
+                $("[name='pageNum']").attr("value",data.pageNum);
+                if(data!=null){
+                    var str="";
+                    for (var i=0;i<data.data.length;i++) {
+                        str+="<tr><td>"+data.data[i].classname+"</td>";
+                        str+="<td>"+data.data[i].name+"</td>";
+                        if(data.data[i].sex==0){
+                            str+="<td>男</td>";
+                        }else{
+                            str+="<td>女</td>";
+                        }
+                        str+="<td>"+data.data[i].code+"</td>";
+                        str+="<td>"+data.data[i].idcard+"</td></tr>"
+                    }
+                    $("[name='list']").html(str);
+
+                }
+            },
+            "json"
+        );
+    }
+
+</script>
+
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header_content">
+            <div class="left">
+                <img src="/static/img/teacher_gl/logo.png" class="logo">
+                <img src="/static/img/teacher_gl/tit.png" class="tit">
+            </div>
+            <div class="right">
+                <div class="user_name">
+                    <img src="/static/img/teacher_gl/user.png" alt="">
+                    <span th:if="${session.admins !=null && session.admins!= ''}">
+                        <span class="name" th:text="${session.admins.idcard}"></span>
+                    </span>
+                </div>
+                <div class="user_help" style="cursor:pointer">
+                    <img src="/static/img/teacher_gl/bz.png" alt="">
+                    <span class="name" onclick="off()">注销</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="section">
+        <div class="content" >
+            <ul class="nav clearfix" style="cursor:pointer;width: 300px">
+                <li onclick="toIndex()" id="G1">导入信息</li>
+                <li onclick="toTea()" id="G2" style="background: #00a0e9; color:#fff;">信息查询</li>
+            </ul>
+
+            <div class="nav_content">
+                <form name="findstudent" class="form">
+                    <input id="pageSize" type="hidden" name="pageSize">
+                    <input id="pageNum" type="hidden" name="pageNum">
+
+                    <!--<div class="item">
+                        <div class="label"><span></span>学校大致名称</div>
+                        <div class="inputVal">
+                            <input type="text" placeholder="请输入学校名称" id="schoolname" name="schoolname" onblur="findSchool()">
+                        </div>
+                    </div>-->
+
+                    <div class="item">
+                        <div class="label"><span>*</span> 学校:</div>
+                        <select name="school" id="scsc" onchange="erji(this)" style="cursor:pointer;float: right">
+                            <option value=""></option>
+                        </select>
+                        <!--<div class="inputVal sel">
+
+                        </div>-->
+                    </div>
+
+                    <div class="item">
+                        <div class="label"><span>*</span> 年级:</div>
+                        <div class="inputVal sel">
+                            <select name="Nj" id="2" onchange="sanji(this)" style="cursor:pointer">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label"><span>*</span> 班级:</div>
+                        <div class="inputVal sel">
+                            <select name="Bj" style="cursor:pointer">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label"><span></span>学员姓名</div>
+                        <div class="inputVal">
+                            <input type="text" placeholder="请输入学员姓名" name="name">
+                        </div>
+                    </div>
+
+                    <div class="item">
+                        <div class="label"><span></span>学籍号</div>
+                        <div class="inputVal">
+                            <input type="text" placeholder="请输入学员学籍号" name="code">
+                        </div>
+                    </div>
+                    <div class="btn" style="width:80px;cursor:pointer;">
+                        <span class="search" onclick="findStudent()">搜索</span>
+                    </div>
+                </form>
+                <table id="tab">
+                    <thead>
+                    <tr>
+                        <td>班级</td>
+                        <td>姓名</td>
+                        <td>性别</td>
+                        <td>学籍号</td>
+                        <td>身份证号</td>
+                    </tr>
+                    </thead>
+                    <tbody name="list">
+
+                    </tbody>
+                </table>
+                <div class="page">
+                    <input type="button" value="上一页" onclick="pre()" style="cursor:pointer;">
+                    <input type="button" value="下一页" onclick="nexta()" style="cursor:pointer;">
+                    <a name="dangqianye"></a>
+                    <a name="countye"></a>
+                </div>
+
+                <div th:if="${map != null}">
+                    总<span th:text="${}"></span>
+                </div>
+
+                <table  th:if="${map != null}">
+                    <thead>
+                    <tr>
+                        <td>错误信息</td>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s:${map}">
+                        <td th:if="${s=='系统错误=请使用xlsx文件，请使用推荐模板导入，防止错误'}">error()</td>
+                        <td th:text="${s}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

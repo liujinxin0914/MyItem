@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.message.dao.TeacherClassesMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.message.model.TeacherClasses">
+        <id column="id" property="id"/>
+        <result column="tea_id" property="teaId"/>
+        <result column="org_id" property="orgId"/>
+        <result column="resver1" property="resver1"/>
+        <result column="resver2" property="resver2"/>
+        <result column="resver3" property="resver3"/>
+        <result column="resver4" property="resver4"/>
+    </resultMap>
+
+</mapper>

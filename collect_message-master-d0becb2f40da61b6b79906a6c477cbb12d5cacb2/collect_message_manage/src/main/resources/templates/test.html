@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>照片上传</title></title>
+    <link rel="stylesheet" href="/static/css/lib/common.css">
+    <link rel="stylesheet" href="/static/css/photo.css">
+    <link rel="stylesheet" href="/static/css/combo.select.css">
+
+
+</head>
+<!--
+https://code.jquery.com/jquery-3.3.1.min.js
+-->
+<script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.combo.select.js"></script>
+<script>
+    function data() {
+        $.post(
+            "/File/download",
+            function (data) {
+                if(data=="success"){
+                    $("#demo").click();
+                }
+            },
+            "json"
+        )
+    }
+    function list() {
+        location="/File/list";
+    }
+    function off() {
+
+        location="/Login/off";
+    }
+    //学校
+    $(function(){
+
+        /*var strcookie = document.cookie;//获取cookie字符串
+        var arrcookie = strcookie.split(";");//分割
+        //遍历匹配
+        for ( var i = 0; i < arrcookie.length; i++) {
+            var arr = arrcookie[i].split("=");
+            if (arr[0] == "updateStatus"){
+                delCookie("updateStatus");
+                location.reload(true);
+            }
+        }*/
+        setInterval(function () {
+            $.post(
+                "/File/getSession",
+                function (data) {
+                    console.log(data);
+                    if(data==1){
+                        $.post(
+                            "/File/delSession",
+                            function aa(aa) {
+                                location.reload();
+                            },
+                            "json"
+                        )
+                    }
+                },
+                "json"
+            )
+        }, 400);
+
+
+        $("#select").select({
+            width: "80px",
+            height: "80px",
+        });
+
+        $.post(
+            "/Excel/findSchool",
+            function (data) {
+                if(data!=null){
+                    $("[name='school']").append("<option value=>请输入学校名称</option>");
+                    for (var i=0;i<data.length;i++) {
+                        $("[name='school']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                    $("[name='school']").comboSelect();
+                }
+            },
+            "json"
+        );
+    })
+    //年级
+    function erji(pid){
+        if(pid==""){
+            $("[name='Nj']").empty();
+            $("[name='Bj']").empty();
+        }
+        $("[name='Nj']").empty();
+        $.post(
+            "/Excel/findNj",
+            {pid:pid.value},
+            function(data) {
+                if(data!=null){
+                    $("[name='Nj']").append("<option value=>--请选择--</option>");
+                    for (var i=0;i<data.length;i++) {
+                        $("[name='Nj']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                }
+            },
+            "json"
+        );
+    }
+    //班级
+    function sanji(pid){
+        $("[name='Bj']").empty();
+        $.post(
+            "/Excel/findBj",
+            {pid:pid.value},
+            function(data) {
+                if(data!=null){
+                    $("[name='Bj']").append("<option value=>--请选择--</option>");
+                    for (var i=0;i<data.length;i++) {
+                        $("[name='Bj']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                }
+            },
+            "json"
+        );
+
+    }
+
+    function pre() {
+        var pagenum = $("[name='pageAum']").val();
+        if((parseInt(pagenum-1)!=0)){
+            $("[name='dangqianye']").html("当前第"+(parseInt(pagenum)-1)+"页");
+        }
+        if((parseInt(pagenum-1)!=0)){
+            $("[name='pageAum']").val(parseInt(pagenum)-1);
+            return true;
+        }else{
+            return false
+        }
+    }
+    function nexta(){
+        var pagenum = $("[name='pageAum']").val();
+        var pagesize = $("[name='pageSize']").val();
+        if((parseInt(pagenum)<parseInt(pagesize))){
+            $("[name='dangqianye']").html("当前第"+(parseInt(pagenum)+1)+"页");
+        }
+        if(parseInt(pagenum)<parseInt(pagesize)){
+            $("[name='pageAum']").val(parseInt(pagenum)+1);
+            return true;
+        }else{
+            return false;
+        }}
+    function tongguo(code) {
+        var box = document.getElementsByName("apiContent");
+        var str="";
+        for(var i = 0;i<box.length;i++){
+            if(box[i].checked==true){
+                str+=","+box[i].value;
+            }
+        }
+        str=str.substring(1);
+        $.post(
+            "/File/shenhe",
+            {str:str},
+            function (data) {
+                if(data==4){
+                    alert("该图片已操作，请勿重复操作");
+                } else if(data!=0){
+                    alert("审核成功");
+                    $("#demo").click();
+                    tongguo();
+                }else{
+                    alert("请选择图片");
+                }
+            },
+            "json"
+        )
+    }
+    function turndown(code) {
+        var box = document.getElementsByName("apiContent");
+        var str="";
+        for(var i = 0;i<box.length;i++){
+            if(box[i].checked==true){
+                str+=","+box[i].value;
+            }
+        }
+        str=str.substring(1);
+        if(str==null||str==undefined||str==""){
+            alert("请选择图片");
+            return false;
+        }
+        var refuse = prompt("请输入驳回说明","");
+        if(refuse==null||refuse==""){
+            alert("请输入驳回信息");
+            return false;
+        }
+        $.post(
+            "/File/turndown",
+            {str:str,refuse:refuse},
+            function (data) {
+                if(data==4){
+                    alert("该图片已操作，请勿重复操作");
+                } else if(data!=0){
+                    alert("驳回成功");
+                    $("#demo").click();
+                    // submit:$("#form").submit();
+
+                }else{
+                    alert("请选择图片");
+                }
+            },
+            "json"
+        )
+    }
+    function download() {
+        var box = document.getElementsByName("apiContent");
+        var str="";
+        for(var i = 0;i<box.length;i++){
+            if(box[i].checked){
+                str+=","+box[i].value;
+            }
+        }
+        str=str.substring(1);
+        if(str==null||str==""){
+            alert("请选择图片");
+        }else{
+            location="/File/download?str="+str;
+        }
+
+    }
+    function changeColor(id) {
+        document.getElementById(id).style.background="#C4E1FF";
+    }
+    function changeColor2(id) {
+        document.getElementById(id).style.background="#fff";
+    }
+    function changeColor3(id) {
+        document.getElementById(id).style.background="#00a0e9";
+    }
+    function changeColor6(id) {
+        document.getElementById(id).style.background="#0000ff";
+    }
+    function toFile() {
+        location="/File/index";
+    }
+</script>
+<!--<style>
+    li{
+        display:inline;  /*  将li设置成内联元素就可以了  */
+    }
+</style>-->
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header_content">
+            <div class="left">
+                <img src="/static/img/teacher_gl/logo.png" class="logo">
+                <img src="/static/img/teacher_gl/tit.png" class="tit">
+            </div>
+            <div class="right">
+                <div class="user_name">
+                    <img src="/static/img/teacher_gl/user.png" alt="">
+                    <span th:if="${session.pictureWorker !=null && session.pictureWorker!= ''}">
+                        <span class="name" th:text="${session.pictureWorker.idcard}"></span>
+                    </span>
+                </div>
+                <div class="user_help">
+                    <img src="/static/img/teacher_gl/bz.png" alt="">
+                    <span class="name" onclick="off()" style="cursor:pointer">注销</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="content clearfix">
+            <ul class="nav clearfix" style="cursor:pointer;width: 300px">
+                <li onclick="toFile()" id="G5" >上传照片</li>
+                <li onclick="list()" id="G6" style="background: #00a0e9; color:#fff;">审核列表</li>
+            </ul>
+
+            <div class="nav_content">
+                <form name="message" class="form" action="/File/findphoto" method="post" return="history.go('-1')">
+                    <div class="item">
+                        <div class="label"><span>*</span> 学校:</div>
+                        <select name="school" id="scsc" onchange="erji(this)" style="cursor:pointer;float: right">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span>*</span>年级</div>
+                        <div class="inputVal sel">
+                            <select name="Nj" onchange="sanji(this)" style="cursor:pointer">
+                                <option value="">--请选择--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span>*</span>班级</div>
+                        <div class="inputVal sel">
+                            <select name="Bj" id="select" style="cursor:pointer">
+                                <option th:value="*{Bj}">--请选择--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span></span>学员姓名</div>
+                        <div class="inputVal">
+                            <input type="text" name="name" placeholder="请输入姓名">
+                        </div>
+                    </div>
+                    <div class="item">
+                        <div class="label"><span></span>学籍号</div>
+                        <div class="inputVal">
+                            <input type="text" name="code" placeholder="请输入学籍号" >
+                        </div>
+                    </div>
+                    <div class="btn">
+                        <input type="submit" value="搜索" id="demo" style="cursor:pointer" onmouseover="changeColor6(this.id)" onmouseout="changeColor3(this.id)"><!--<span class="search"></span><span class="add">添加</span>-->
+                    </div>
+
+
+            <div class="photo clearfix" style="margin-top: 20px">
+                <!--有照片-->
+                <div>
+                    <div class="allPhoto" th:each="s:${ilist}">
+                        <dl>
+                            <div class="gouxuan">
+                                <input type="checkbox" th:value="${s.code}" name="apiContent" class="check">
+                                <label for="" class="weixuanzhong"></label>
+                            </div>
+                            <dt><img th:src="${path+s.url}" alt="" th:value="${s.url}" id="iimg"></dt>
+                            <dd>
+                                <p class="name">姓名:<span th:text="${s.name}"></span></p>
+                                <p class="xjh">学籍号:<span th:text="${s.code}"></span></p>
+                            </dd>
+                        </dl>
+                    </div>
+                    <!--没有照片-->
+                    <div class="nonePhoto">
+                        <img src="/static/photo/photo/zpsc.png" alt="">
+                    </div>
+                </div>
+            </div>
+                    <div class="page" th:if="${pageSize>0}">
+                        <input type="submit" value="上一页" onclick="return pre()" style="cursor:pointer">
+                        <input type="submit" value="下一页" onclick="return nexta()" style="cursor:pointer">
+                        当前第<input type="text" name="pageAum" th:value="*{pagenum}" id="demo2" style="height:20px;width:20px">页，共
+                        <input type="text" name="pageSize" th:value="*{pageSize}" id="demo3" style="height:20px;width:20px">页
+                    </div>
+                    <input type="button" th:value="*{error}" id="demo1" style="color: red">
+                </form>
+            </div>
+            <div class="_btn" th:if="${pageSize>0}">
+                <span class="cancelBtn" onclick="tongguo()" style="cursor:pointer" onmouseover="changeColor(this.id)" onmouseout="changeColor2(this.id)" id="G1">通过</span>
+                <span class="cancelBtn" onclick="download()" style="cursor:pointer" onmouseover="changeColor(this.id)" onmouseout="changeColor2(this.id)" id="G2">下载</span>
+                <span class="cancelBtn" onclick="turndown()" style="cursor:pointer" onmouseover="changeColor(this.id)" onmouseout="changeColor2(this.id)" id="G3">驳回</span>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+
+

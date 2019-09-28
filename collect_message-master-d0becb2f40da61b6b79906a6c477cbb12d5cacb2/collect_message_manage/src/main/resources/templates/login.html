@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>登录</title>
+    <link rel="shortcut icon" href="#" />
+    <link rel="stylesheet" href="/static/css/login.css" type="text/css">
+</head>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    function tologin(){
+        $.post(
+            "/Login/login",
+            $("[name='teacher']").serialize(),
+            function (data) {
+                if(data==1){
+                    //?name="+data.name+"&org_id="+data.org_id+"&classname="+data.classname
+                    location="/Manage/index1";
+                }else if(data==3){
+                    alert("用户名或密码错误,并且请您保证您的权限");
+                }else if(data==2){
+                    location="/Excel/index";
+                }else if(data.classname!=undefined&&data.classname!=null){
+                    var name = data.name;
+                    var org_id = data.org_id;
+                    location="/Manage/index?org_id="+org_id;
+                }else if(data==10){
+                    alert("用户名不能为空");
+                }
+                else if(data==11){
+                    alert("密码不能为空");
+                }
+
+            },
+            "json"
+        );
+    }
+    function topwd() {
+        alert("请联系管理员");
+    }
+    /* function changeColor(id) {
+         document.getElementById(id).style.color="#FFD306";
+     }
+     function changeColor3(id) {
+         document.getElementById(id).style.color="#000000";
+     }*/
+</script>
+<body>
+<div class="container">
+    <div class="content">
+        <img src="/static/img/login/tit.png" class="title">
+        <div class="login">
+            <h3>用户登录</h3>
+            <form name="teacher">
+            <ul>
+                <li>
+                    <img src="/static/img/login/zhanghao.png" alt="">
+                    <input type="text" placeholder="请输入账号" name="idcard">
+                </li>
+                <li>
+                    <img src="/static/img/login/mima.png" alt="">
+                    <input type="password" placeholder="请输入密码" name="inputString">
+                </li>
+            </ul>
+            </form>
+            <div class="forgetPas" onclick="topwd()" style="cursor:pointer">忘记密码？</div>
+            <div class="btn" onclick="tologin()" style="cursor:pointer">登录</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
+
+

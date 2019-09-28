@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>信息采集</title>
+
+    <link rel="stylesheet" href="/static/css/lib/common.css">
+    <link rel="stylesheet" href="/static/css/teacher_gl.css">
+</head>
+<style>
+    #GG{
+        /* border: 1px solid #00a0e9;    边框*/
+        text-align: center;        /*文字水平居中对齐*/
+        line-height: 30px;        /*设置文字行距等于div的高度*/
+        overflow:hidden;
+        margin-top: 2px;            /*间距*/
+    }
+</style>
+
+<body>
+<div class="container">
+    <div class="header">
+        <div class="header_content">
+            <div class="left">
+                <img src="/static/img/teacher_gl/logo.png" class="logo">
+                <img src="/static/img/teacher_gl/tit.png" class="tit">
+            </div>
+            <div class="right">
+                <div class="user_name">
+                    <img src="/static/img/teacher_gl/user.png" alt="">
+                    <span th:if="${session.user !=null && session.user!= ''}">
+                        <span class="name" th:text="${session.user.name}"></span>
+                    </span>
+                </div>
+                <div class="user_help" style="cursor:pointer">
+                    <img src="/static/img/teacher_gl/bz.png" alt="">
+                    <span class="name" onclick="off()">注销</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <input type="hidden" name="org_id"  th:value="*{org_id}" id="org_id">
+
+    <div class="section">
+        <div class="content">
+            <ul class="nav clearfix" style="cursor:pointer">
+                <li onclick="toFind()"  style="background: #00a0e9; color:#fff;">采集情况</li>
+                <li onclick="toTea()"   id="G2">教师管理</li>
+                <li onclick="toStu()"   id="G3">学员管理</li>
+            </ul>
+
+            <div style="width:200px;float: left" class="leftBox">
+
+
+                <div th:each="s:${grade}" >
+                    <div  th:value="${s.id}" class="GG" th:text="${s.name}" th:onclick="findMessageToSch(this,[[${s.id}]])" style="width: 100%;height: 45px;line-height:45px;text-align:center;color: #00a0e9;background: #ECF5FF;cursor:pointer" /></div>
+                </div>
+
+            <!--<span th:if="${s.Notcount>0}">  th:each="s:${list}"
+                       <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background: #00a0e9;border:1px solid #00a0e9;font-size: 15px;color: #F5F5F5;border-radius:8px ; padding:10px 0; text-align:center;">
+                           班级：<span th:text="${s.classes}"></span><br>
+                           班主任：<span th:text="${s.teacher}"></span><br>
+                           未审核人数：<span th:text="${s.Notcount}"></span><br>
+                           总人数：<span th:text="${s.count}"></span><br>
+                       </div>
+                   </span>
+           <span th:if="${s.Notcount==0}">
+                       <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background: #ffffff;border:1px solid #00a0e9;font-size: 15px;color: #00a0e9;border-radius:8px ; padding:10px 0; text-align:center;">
+                           班级：<span th:text="${s.classes}"></span><br>
+                           班主任：<span th:text="${s.teacher}"></span><br>
+                           未审核人数：<span th:text="${s.Notcount}"></span><br>
+                           总人数：<span th:text="${s.count}"></span><br> margin: 0 3% 20px float: left; width:19%;
+                       </div>
+                   </span>-->
+            <div style="float:right; width: 790px;" class="rightBox">
+                <div name="message" style="border-color: black;flex-flow:row wrap;display:flex;white-space:nowrap;">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" th:inline="none"></script>
+<script>
+
+    // function clientHeight(){//获取屏幕高度 并 添加滚动条
+    //     var height = document.documentElement.clientHeight - 120;
+    //     // var width = document.documentElement.clientWidth - 210;
+    //     _h = height+'px';
+    //     // _w = width+'px';
+    //     console.log('高',_h);
+    //     console.log($('.section .content .leftBox'))
+    //     $('.section .content .leftBox').css({'height':_h, 'overflow-y':'scroll','-webkit-overflower-scrolling':'touch'});
+    //     $('.section .content .rightBox').css({'height':_h, 'overflow-y':'scroll','-webkit-overflower-scrolling':'touch'});
+    // }
+    // clientHeight();
+    //
+    // window.onresize=function(){//监听浏览器窗口变化
+    //     clientHeight();
+    // }
+
+    function off() {
+
+        location="/Login/off";
+    }
+    function findMessageToSch(code,id) {
+        $(code).css({'background':'#D9FFFF'}).parent().siblings().find($('.GG')).css({'background':'#ECF5FF'});
+        $.post(
+            "/Manage/findMessageToSch",
+            {id:id},
+            function (data) {
+                console.log(data.list);
+                var str ="";
+                for(var i=0;i<data.list.length;i++){
+                    if(data.list[i].notcount!=data.list[i].count){
+                        str+="<div style='margin-bottom: 20px; width:150px;margin-left:30px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background: #00a0e9;border:1px solid #00a0e9;font-size: 15px;color: #F5F5F5;border-radius:8px ; padding:10px 0; text-align:center;'>";
+                        str+="班级：<span>"+data.list[i].classes+"</span><br>";
+                        if(data.list[i].teacher!=null&&data.list[i].teacher!=" "&&data.list[i].teacher!="null"){
+                            str+="班主任：<span>"+data.list[i].teacher+"</span><br>";
+                        }else{
+                            str+="班主任：<span>无</span><br>";
+                        }
+                        str+="已完成人数：<span>"+data.list[i].notcount+"</span><br>";
+                        str+="总人数：<span>"+data.list[i].count+"</span><br>";
+                        str+="</div>";
+                    }else if(data.list[i].notcount==data.list[i].count){
+                        str+="<div style='margin-bottom: 20px; width:150px;margin-left:30px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background: #ffffff;border:1px solid #00a0e9;font-size: 15px;color: #00a0e9;border-radius:8px ; padding:10px 0; text-align:center;'>";
+                        str+="班级：<span>"+data.list[i].classes+"</span><br>";
+                        if(data.list[i].teacher==null||data.list[i].teacher==" "||data.list[i].teacher=="null"){
+                            str+="班主任：<span>无</span><br>";
+                        }else{
+                            str+="班主任：<span>"+data.list[i].teacher+"</span><br>";
+                        }
+                        str+="已完成人数：<span>"+data.list[i].notcount+"</span><br>";
+                        str+="总人数：<span>"+data.list[i].count+"</span><br>";
+                        str+="</div>";
+                    }
+                    $("[name='message']").html(str);
+                }
+            },
+            "json"
+        )
+    }
+    function toFind() {
+        var org_id = $("#org_id").val();
+        location="/Manage/toFind?org_id="+org_id;
+    }
+    function toTea() {
+        var org_id = $("#org_id").val();
+        location="/Manage/toTeacher?org_id="+org_id;
+    }
+    function toStu() {
+        var classname = $("#classname").val();
+        var org_id = $("#org_id").val();
+        location="/Manage/index?classname="+classname+"&org_id="+org_id;
+    }
+</script>
+</html>

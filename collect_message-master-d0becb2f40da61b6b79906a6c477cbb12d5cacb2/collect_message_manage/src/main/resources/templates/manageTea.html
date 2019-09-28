@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no,minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>学员管理</title>
+    <link rel="stylesheet" href="/static/css/lib/common.css">
+    <link rel="stylesheet" href="/static/css/photo.css">
+    <link rel="stylesheet" href="/static/css/teacher_gl.css">
+    <link rel="stylesheet" href="/static/css/index_like.css">
+</head>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" th:inline="none"></script>
+<script>
+
+    function tiaojian(data) {
+        if(data.value==1){
+            $("[name='guanli']").show();
+            $("[name='quanxian']").hide();
+            $('table').hide();
+            $('.page').hide();
+            document.getElementById("name").value="";
+            document.getElementById("idcard").value="";
+
+        }else if(data.value==2){
+            $("[name='guanli']").hide();
+            $("[name='quanxian']").show();
+            $('table').hide();
+            $('.page').hide();
+            document.getElementById("name").value="";
+            document.getElementById("idcard").value="";
+        }else{
+            $("[name='guanli']").hide();
+            $("[name='quanxian']").hide();
+            $('table').hide();
+            $('.page').hide();
+            document.getElementById("name").value="";
+            document.getElementById("idcard").value="";
+        }
+    }
+    <!--查找出来班级-->
+    function findClass(msg){
+        $("[name='Classes']").empty();
+        var message = msg.value;
+        $.post(
+            "/Manage/findClass",
+            {msg:msg.value},
+            function (data) {
+                if(data!=null){
+                    $("[name='Classes']").append("<option value=''>全部</option>");
+                    for (var i = 0;i<data.length;i++){
+                        $("[name='Classes']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                }else{
+                    $("[name='Classes']").append("<option value=''>请选择</option>");
+                }
+            },
+            "json"
+        )
+    }
+    <!--获取用户学校id进行年级查找-->
+    $(function(){
+        $('.dangqianye').hide();
+        $('table').hide();
+        $('._btn').hide();
+        $('.page').hide();
+        $("[name='guanli']").hide();
+        $("[name='quanxian']").hide();
+        var ids = ($("[name='org_id']").val());
+        $.post(
+            "/Manage/findGradeBytea",
+            {ids:ids},
+            function (data) {
+                if(data!=null){
+                    for (var i = 0;i<data.length;i++){
+                        $("[name='Grade']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                }
+            },
+            "json"
+        )
+    });
+    <!--回显-->
+    function toupdateBytea(idcard) {
+        idcard = idcard.id;
+        $('.black').show();
+        $("[name='inorup']").val(2);
+        var classname = $("#classname").val();
+        var org_id = $("#org_id").val();
+        var classid = $("[name='Classes']").val();
+        $.post(
+            "/Manage/findstudentgrade",
+            {org_id:org_id},
+            function (data) {
+                if(data!=null){
+                    $("[name='grade']").empty();
+                    $("[name='grade']").append("<option value=''>请选择</option>");
+                    $("[name='class_id']").append("<option value=''>请选择</option>");
+                    for (var i=0;i<data.length;i++){
+                        $("[name='grade']").append("<option value="+data[i].id+">"+data[i].name+"</option>>");
+                    }
+                }
+            },
+            "json"
+        );
+        $.post(
+            "/Manage/toupdateBytea",
+            {idcard:idcard,classname:classname,org_id:org_id,classid:classid},
+            function (data) {
+                console.log(data);
+                $('#name1').val(data.teaList.name);
+                $('#mobile').val(data.teaList.mobile);
+                $('#idcard1').val(data.teaList.idcard);
+                if(data.teaList.sex==1){
+                    var sex = "男";
+                }else{
+                    var sex = "女";
+                }
+                $('#sex1').val(sex);
+                $("[name='org_id']").val(data.org_id);
+                $("[name='idcardByone']").val(data.idcardByone);
+            },
+            "json"
+        );
+        /*location = "/Manage/toupdateBytea?idcard="+idcard+"&classname="+classname+"&org_id="+org_id+"&classid="+classid;*/
+    }
+    <!--修改密码-->
+    function updatepasswordByTea(idcard) {
+        idcard = idcard.id;
+        var classname = $("#classname").val();
+        var org_id = $("#org_id").val();
+        var refuse = prompt("请输入新密码","");
+        if(refuse==null||refuse==""){
+            return false;
+        }
+        $.post(
+            "/Manage/updatepasswordByTea",
+            {idcard:idcard,refuse:refuse},
+            function (data) {
+                if(data==5){
+                    alert("该用户不存在");
+                }else if(data!=null){
+                    alert("重置成功");
+                    findTeamessage();
+                }
+            },
+            "json"
+        );
+    }
+    function toFind() {
+        var org_id = $("#org_id").val();
+        location="/Manage/toFind?org_id="+org_id;
+    }
+    function off() {
+        location="/Login/off";
+    }
+    <!--添加-->
+    function toaddTea() {
+        document.getElementById("idcard1").value="";
+        document.getElementById("mobile").value="";
+        document.getElementById("sex1").value="";
+        document.getElementById("name1").value="";
+        $('#name1').empty();
+        $('#mobile').empty();
+        $('#idcard1').empty();
+        $("[name='grade']").empty();
+        $("[name='class_id']").empty();
+
+        $('.black').show();
+        $("[name='inorup']").val(1);
+        var classname = $("#classname").val();
+        var org_id = $("#org_id").val();
+        $.post(
+            "/Manage/findstudentgrade",
+            {org_id:org_id},
+            function (data) {
+                if(data!=null){
+                    $("[name='grade']").empty();
+                    $("[name='grade']").append("<option value=''>请选择</option>");
+                    $("[name='class_id']").append("<option value=''>请选择</option>");
+                    for (var i=0;i<data.length;i++){
+                        $("[name='grade']").append("<option value="+data[i].id+">"+data[i].name+"</option>");
+                    }
+                }
+            },
+            "json"
+        );
+        /*location="/Manage/toaddTea?classname="+classname+"&org_id="+org_id;*/
+    }
+    <!--取消-->
+    function turnadd() {
+        $('.black').hide();
+        $('#name1').empty();
+        $('#mobile').empty();
+        $('#idcard1').empty();
+        $("[name='grade']").empty();
+        $("[name='class_id']").empty();
+    }
+    <!--跳转-->
+    function toStu() {
+        var classname = $("#classname").val();
+        var org_id = $("#org_id").val();
+        location="/Manage/index?classname="+classname+"&org_id="+org_id;
+    }
+    function shanchu(classid) {
+        if(confirm("确实要删除吗？")){
+            classid = classid.id;
+            var classname = $("#classname").val();
+            var org_id = $("#org_id").val();
+            $.post(
+                "/Manage/deletesByTea",
+                {classid:classid},
+                function (data) {
+                    if(data==1){
+                        alert("删除成功");
+                        findTeamessage();
+                        /*/!* location="/Manage/toTeacher?org_id="+org_id+"&classname="+classname;*!/*/
+                    }
+                },
+                "json"
+            );
+        }
+    }
+    <!--查询+分页-->
+    function findTeamessage() {
+        var a = $("[name='panduan']").val();
+        if(a==1){
+            var b = $("[name='Grade']").val();
+            if(b==""){
+                alert("请选择年级")
+                return false;
+            }
+        }
+        $.post(
+            "/Manage/findTeamessage",
+            $("[name='message']").serialize(),
+            function (data) {
+                var pageaum = data.pagenum+"";
+                var pagesizea = data.pageSize+"";
+                console.log(data);
+                if(data.TeacherList.length>0){
+                    $('table').show();$('._btn').show();$('.dangqianye').show();$('.page').show();
+                }else{
+                    $('table').hide();$('._btn').hide();$('.dangqianye').hide();$(".page").hide();
+                }
+                var str="";
+                $("#error").val(data.error);
+                if(data.error==null||data.error==""){
+                    if(data.TeacherList==""||data.TeacherList==null){
+                        alert("查询无信息");
+                        $("[name='list']").empty();
+                        return false;
+                    }
+                }
+                for (var i=0;i<data.TeacherList.length;i++) {
+                    str+="<tr><td>"+data.TeacherList[i].name+"</td>";
+                    str+="<td>"+data.TeacherList[i].mobile+"</td>";
+                    str+="<td>"+data.TeacherList[i].idcard+"</td>";
+                    if(data.TeacherList[i].sex==0){
+                        str+="<td>女</td>";
+                    }else{
+                        str+="<td>男</td>";
+                    }
+                    if(data.TeacherList[i].classname!=null&&data.TeacherList[i].classname!="    "){
+                        str+="<td>"+data.TeacherList[i].classname+"</td>";
+                    }else{
+                        str+="<td> - </td>";
+                    }
+                    str+="<td><input type='button' id='"+data.TeacherList[i].idcard+"' style='cursor:pointer;' value='删除' onclick='shanchu(this)'>" +
+                        "<input type='button' id='"+data.TeacherList[i].idcard+"' style='cursor:pointer;' value='修改' onclick='toupdateBytea(this)'>" +
+                        "<input type='button' id='"+data.TeacherList[i].idcard+"' style='cursor:pointer;' value='重置密码' onclick='updatepasswordByTea(this)'></td></tr>";
+                }
+                $("[name='list']").html(str);
+                $("[name='pageAum']").val(pageaum);
+                $("[name='pageSize']").val(pagesizea);
+                var pagenum = $("[name='pageNum']").val();
+                var pagesize = $("[name='pageSize']").val();
+                $("[name='dangqianye']").html("当前第"+1+"页");
+                $("[name='countye']").html("共"+pagesize+"页");
+            },
+            "json"
+        );
+    }
+    function pre() {
+        var pagenum = $("[name='pageAum']").val();
+        if((parseInt(pagenum-1)>0)){
+            $("[name='dangqianye']").html("当前第"+(parseInt(pagenum)-1)+"页");
+            $("[name='pageAum']").val(parseInt(pagenum)-1);
+        }
+        $.post(
+            "/Manage/findTeamessage",
+            $("[name='message']").serialize(),
+            function (data) {
+                var pageaum = data.pagenum+"";
+                var pagesizea = data.pageSize+"";
+                console.log(data);
+                $("#error").val(data.error);
+                var str="";
+                for (var i=0;i<data.TeacherList.length;i++) {
+                    str+="<tr><td>"+data.TeacherList[i].name+"</td>";
+                    str+="<td>"+data.TeacherList[i].mobile+"</td>";
+                    str+="<td>"+data.TeacherList[i].idcard+"</td>";
+                    if(data.TeacherList[i].sex==0){
+                        str+="<td>女</td>";
+                    }else{
+                        str+="<td>男</td>";
+                    }
+                    if(data.TeacherList[i].classname!=null&&data.TeacherList[i].classname!="    "){
+                        str+="<td>"+data.TeacherList[i].classname+"</td>";
+                    }else{
+                        str+="<td> - </td>";
+                    }
+                    str+="<td><input type='button' id='"+data.TeacherList[i].idcard+"' style='cursor:pointer;' value='删除' onclick='shanchu(this)'>" +
+                        "<input type='button' id='"+data.TeacherList[i].idcard+"' style='cursor:pointer;' value='修改' onclick='toupdateBytea(this)'>" +
+                        "<input type='button' id='"+data.TeacherList[i].idcard+"' style='cursor:pointer;' value='重置密码' onclick='updatepasswordByTea(this)'></td></tr>";
+                }
+                $("[name='list']").html(str);
+                $("[name='pageAum']").val(pageaum);
+                $("[name='pageSize']").val(pagesizea);
+
+            },
+            "json"
+        );
+    }
+    function nexta(){
+        var pagenum = $("[name='pageAum']").val();
+        var pagesize = $("[name='pageSize']").val();
+        if((parseInt(pagenum)<parseInt(pagesize))){
+            $("[name='dangqianye']").html("当前第"+(parseInt(pagenum)+1)+"页");
+            $("[name='countye']").html("共"+pagesize+"页");
+        }
+        if(parseInt(pagenum)<parseInt(pagesize)){
+            $("[name='pageAum']").val(parseInt(pagenum)+1);
+        }
+        $.post(
+            "/Manage/findTeamessage",
+            $("[name='message']").serialize(),
+            function (data) {
+                var pageaum = data.pagenum+"";
+                var pagesizea = data.pageSize+"";
+                console.log(data);
+                $("#error").val(data.error);
+                var str="";
+                for (var i=0;i<data.TeacherList.length;i++) {
+                    str+="<tr><td>"+data.TeacherList[i].name+"</td>";
+                    str+="<td>"+data.TeacherList[i].mobile+"</td>";
+                    str+="<td>"+data.TeacherList[i].idcard+"</td>";
+                    if(data.TeacherList[i].sex==0){
+                        str+="<td>女</td>";
+                    }else{
+                        str+="<td>男</td>";
+                    }
+                    if(data.TeacherList[i].classname!=null&&data.TeacherList[i].classname!="    "){
+                        str+="<td>"+data.TeacherList[i].classname+"</td>";
+                    }else{
+                        str+="<td> - </td>";
+                    }
+                    str+="<td><input type='button' id='"+data.TeacherList[i].idcard+"'style='cursor:pointer;' value='删除' onclick='shanchu(this)'>" +
+                        "<input type='button' id='"+data.TeacherList[i].idcard+"' style='cursor:pointer;' value='修改' onclick='toupdateBytea(this)'>" +
+                        "<input type='button' id='"+data.TeacherList[i].idcard+"' style='cursor:pointer;' value='重置密码' onclick='updatepasswordByTea(this)'></td></tr>";
+                }
+                $("[name='list']").html(str);
+                $("[name='pageAum']").val(pageaum)
+                $("[name='pageSize']").val(pagesizea);
+            },
+            "json"
+        );
+    }
+    <!--添加or修改-->
+    function add() {
+
+        var i = $("[name='inorup']").val();
+        if(i==1){
+            <!--添加-->
+            $.post(
+                "/Manage/insertTea",
+                $("form").serialize(),
+                function (data) {
+                    if(data==3){
+                        alert("请选择班级");
+                    }if(data==4){
+                        alert("身份证号重复");
+                    }if(data.i==1){
+                        alert("成功");
+                        location="/Manage/toTeacher?org_id="+data.org_id+"&classname="+data.classname;
+                    }if(data==5){
+                        alert("身份证号不符合规则");
+                    }
+                    if(data==6){
+                        alert("姓名输入不合法");
+                    }if(data==7){
+                        alert("该班级已经存在班主任");
+                    }
+                    if(data==8){
+                        alert("姓名不能为空");
+                    }
+                    if(data==9){
+                        alert("性别不能为空");
+                    }
+                    if(data==10){
+                        alert("手机号不合法");
+                    }
+                    if(data==11){
+                        alert("身份证号不合法");
+                    }if(data==12){
+                        alert("姓名长度不能小于2");
+                    }if(data==13){
+                        alert("手机号不能含有中文");
+                    }if(data==14){
+                        alert("请输入11位的手机号码");
+                    }if(data==15){
+                        alert("该班级已经存在班主任");
+                    }
+                },
+                "json"
+            );
+        }else if(i==2){
+            $.post(
+                "/Manage/updateTea",
+                $("[name='insertStudent']").serialize(),
+                function (data) {
+                    if(data==3){
+                        alert("请选择班级");
+                    }if(data==4){
+                        alert("身份证号重复");
+                    }if (data.i==1){
+                        alert("成功");
+                        location="/Manage/toTeacher?org_id="+data.org_id+"&classname="+data.classname;
+                    }if(data==5){
+                        alert("身份证号码或手机号不能含有中文");
+                    }if(data==6){
+                        alert("姓名输入不合法");
+                    }if(data==7){
+                        alert("该班已经存在班主任");
+                    }
+                    if(data==8){
+                        alert("姓名不能为空");
+                    }
+                    if(data==9){
+                        alert("性别不能为空");
+                    }
+                    if(data==10){
+                        alert("手机号不合法");
+                    }
+                    if(data==11){
+                        alert("身份证号不合法");
+                    }if(data==12){
+                        alert("姓名长度不能小于2");
+                    }
+                    if(data==13){
+                        alert("性别不能为空");
+                    }
+                    if(data==14){
+                        alert("请输入长度位11的手机号码");
+                    }
+                },
+                "json"
+            );
+        }
+
+        <!--修改-->
+    }
+    <!--查找班级-->
+    function findclass(id){
+        $.post(
+            "/Manage/findstudentclass",
+            {id:id.value},
+            function (data) {
+                $("[name='class_id']").empty();
+                $("[name='class_id']").append("<option value=''>请选择</option>");
+                if(data!=null){
+                    $("[name='class_id']").empty();
+                    for (var i=0;i<data.length;i++){
+                        $("[name='class_id']").append("<option value="+data[i].id+">"+data[i].name+"</option>>");
+                    }
+                }
+            },
+            "json"
+        );}
+    function changeColor2(id) {
+        document.getElementById(id).style.background="#DDDDDD";
+    }
+    function changeColor3(id) {
+        document.getElementById(id).style.background="#FFFFFF";
+    }
+</script>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="header_content">
+            <div class="left">
+                <img src="/static/img/teacher_gl/logo.png" class="logo">
+                <img src="/static/img/teacher_gl/tit.png" class="tit">
+            </div>
+            <div class="right">
+                <div class="user_name">
+                    <img src="/static/img/teacher_gl/user.png" alt="">
+                    <span th:if="${session.user !=null && session.user!= ''}">
+                        <span class="name" th:text="${session.user.name}"></span>
+                    </span>
+                </div>
+                <div class="user_help" style="cursor:pointer">
+                    <img src="/static/img/teacher_gl/bz.png" alt="">
+                    <span class="name" onclick="off()">注销</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <div class="content">
+            <ul class="nav clearfix" style="cursor:pointer">
+                <li onclick="toFind()"  id="G1">采集情况</li>
+                <li onclick="toTea()" id="G2" style="background: #00a0e9; color:#fff;">教师管理</li>
+                <li onclick="toStu()" id="G3">学员管理</li>
+            </ul>
+
+            <div class="nav_content">
+                <form name="message">
+                    <input id="pageSize" type="hidden" name="pageSize">
+                    <input id="pageAum" type="hidden" name="pageAum">
+                    <input type="hidden" name="org_id" th:value="*{org_id}" id="org_id">
+                    <input type="hidden" name="classname" th:value="*{classname}" id="classname">
+                    <div class="form">
+
+                        <div class="item">
+                            <div class="label"><span>*</span>条件</div>
+                            <div class="inputVal sel">
+                                <select name="panduan" onchange="tiaojian(this)" style="cursor:pointer">
+                                    <option th:value="5">请选择</option>
+                                    <option th:value="2">查询全部</option>
+                                    <option th:value="1">查询班主任</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div name="guanli">
+
+                        <div class="item">
+                            <div class="label"><span>*</span> 年级</div>
+                            <div class="inputVal sel">
+                                <select name="Grade" id="1" onchange="findClass(this)" style="cursor:pointer">
+                                    <option th:value="*{Grade}">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label"><span></span> 班级</div>
+                            <div class="inputVal sel">
+                                <select name="Classes" id="2" style="cursor:pointer">
+                                    <option th:value="*{Classes}">请选择</option>
+                                </select>
+                            </div>
+                        </div>
+
+                            <div class="btn">
+                                <span class="cancelBtn" onclick="findTeamessage()" style="color: #00a0e9;cursor:pointer;border: 1px solid #00a0e9" id="G11" onmouseover="changeColor2(this.id)" onmouseout="changeColor3(this.id)">搜索</span>
+                                <span class="cancelBtn" onclick="toaddTea()" style="margin-left:140px;color: #00a0e9;cursor:pointer;border: 1px solid #00a0e9" id="G12" onmouseover="changeColor2(this.id)" onmouseout="changeColor3(this.id)">添加</span>
+                            </div>
+
+                        </div>
+
+
+                        <div name="quanxian">
+
+                        <div class="item">
+                            <div class="label"><span></span>教师姓名</div>
+                            <div class="inputVal">
+                                <input type="text" placeholder="请输入教师姓名" name="name" id="name">
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="label"><span></span>身份证号</div>
+                            <div class="inputVal">
+                                <input type="text" placeholder="请输入身份证号" name="idcard" id="idcard">
+                            </div>
+                        </div>
+                        <div class="btn">
+                            <span class="cancelBtn" onclick="findTeamessage()" style="color: #00a0e9;cursor:pointer;border: 1px solid #00a0e9" id="G10" onmouseover="changeColor2(this.id)" onmouseout="changeColor3(this.id)">搜索</span>
+                            <span class="cancelBtn" onclick="toaddTea()" style="margin-left:140px;color: #00a0e9;cursor:pointer;border: 1px solid #00a0e9" id="G9" onmouseover="changeColor2(this.id)" onmouseout="changeColor3(this.id)">添加</span>
+                        </div>
+
+
+                        </div>
+
+                    </div>
+                </form>
+
+
+
+
+            </div>
+            <!--<div class="table_box"></div>-->
+            <input type="text" name="error" id="error" style="color: red;font-size: 20px">
+            <table  width="100%"  style="table-layout:fixed">
+                <tr>
+                    <th width="100" >姓名</th>
+                    <th width="240">手机号</th>
+                    <th width="240">身份证号</th>
+                    <th width="100">性别</th>
+                    <th width="100">班级</th>
+                    <th width="240">操作</th>
+                </tr>
+                <tbody name="list">
+                </tbody>
+            </table>
+
+            <div class="page">
+                <span class="nextPage" onclick="pre()" id="Y1" >上一页</span>
+                <a name="dangqianye" class="dangqianye"></a>
+                <!--onmouseover="changeColor2(this.id)" onmouseout="changeColor3(this.id)"-->
+                <span class="prevPage" onclick="nexta()"  id="Y2" >下一页</span>
+                <a name="countye"></a>
+            </div>
+        </div>
+    </div>
+    <!--弹出框-->
+    <div class="black">
+
+        <form name="insertStudent">
+            <input type="hidden" name="org_id" th:value="*{org_id}">
+            <input type="hidden" name="inorup"  th:value="*{inorup}">
+            <input type="hidden" name="idcardByone"  th:value="*{idcardByone}">
+            <div class="center">
+
+                <div class="item">
+                    <div class="label"><span>*</span>年级</div>
+                    <div class="inputVal sel">
+                        <select onchange="findclass(this)" name="grade">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="label"><span>*</span>班级</div>
+                    <div class="inputVal sel">
+                        <select name="class_id">
+                            <option value="">请选择</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="label"><span>*</span>姓名</div>
+                    <div class="inputVal">
+                        <input type="text" id="name1" name="name" placeholder="请输入姓名" maxlength="10">
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="label"><span>*</span>性别</div>
+                    <div class="inputVal sel">
+                        <select name="sex" id="sex1">
+                            <option value="">请选择</option>
+                            <option th:value="女">女</option>
+                            <option th:value="男">男</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="item">
+                    <div class="label"><span>*</span>身份证号</div>
+                    <div class="inputVal">
+                        <input type="text" name="idcard" id="idcard1" placeholder="请输入身份证号">
+                    </div>
+                </div>
+                <div class="item">
+
+                    <div class="label"><span>*</span>手机号</div>
+                    <div class="inputVal">
+                        <input type="text" name="mobile" id="mobile" placeholder="请输入手机号">
+                    </div>
+                </div>
+                <div class="btn">
+                    <span class="cancel" onclick="turnadd()" style="cursor: pointer">取消</span>
+                    <span class="cancel" onclick="add()" style="cursor: pointer">保存</span>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+</body>
+</html>
+
+
+
+

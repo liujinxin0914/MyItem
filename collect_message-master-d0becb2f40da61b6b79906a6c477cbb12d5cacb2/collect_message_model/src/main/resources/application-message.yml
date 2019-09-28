@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.2.235:3306/collect_message?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: Hwkjit1111.
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      auto-commit: true
+      #    pool-name: collectPool
+      validationTimeout: 3000
+      connectionTimeout: 60000
+      idleTimeout: 60000
+      maximumPoolSize: 10
+      maxLifetime: 60000
+
+mybatis-plus:
+  mapper-locations: classpath:com/message/dao/mapping/*.xml
+  typeAliasesPackage: com.message.model
+  global-config.db-config.db-type: MYSQL
+  
