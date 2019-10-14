@@ -1,0 +1,20 @@
+@Test
+	public void test1() throws Exception{
+		File file = new File("F:\\signCert.pfx");
+		byte[] buf = new byte[(int) file.length()];
+		FileInputStream fis = new FileInputStream(file);  
+		fis.read(buf);
+		fis.close();
+		
+		KeyStore ks = GmUtil.getKeyStoreByPfx(buf, "123456");		
+        Certificate cert = ks.getCertificate("");
+        PublicKey pubkey = cert.getPublicKey();          
+        PrivateKey prikey = (PrivateKey)ks.getKey("", "123456".toCharArray());
+       
+        byte[] srcData = "5063849093".getBytes();
+		byte[] id = "65949aa5bc3244fb9e0366d47b828986".getBytes();
+		byte[] sig = GmUtil.signSm3WithSm2(srcData, id, prikey);
+		System.out.println(Hex.toHexString(sig));
+		System.out.println(Base64.byteArrayToBase64( sig ));
+		System.out.println(GmUtil.verifySm3WithSm2(srcData, id, sig, pubkey));
+	}
